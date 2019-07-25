@@ -6,12 +6,13 @@
  * 
  */
 
-const superagent=require('superagent')
-const cheerio=require('cheerio')
 
 const uuid=require('../utils/common').uuid
 const query=require('../utils/common').query
 const fork=require('../utils/common').fork
+
+const Models=require('../model')
+
 
 
 
@@ -30,21 +31,26 @@ const cb=async $=>{
          var newsImg= $(this).find('.load a img').attr('src');
          var uid=uuid()
  
-         var addSql = "insert into 1905_huaxu(title,create_time,thumb_img,thumb_content,uid) values (?,?,?,?,?)"; 
-         var addParmas = [newsTitle, newsTime,newsImg,content,uid];
- 
-         let re=await query(addSql,addParmas)
- 
-         if(re&&re.insertId){
+         var news=await Models.News.create({
+             title:newsTitle,
+             create_time:new Date(),
+             thumb_img:newsImg,
+             thumb_content:content,
+             uid,
+         })
+
+         if(news){
              
              fork(href)(async $1=>{
                 let cont=$1('.single-content')
                 cont.find('.tg-pc').remove()
                 cont=cont.html()
  
-                addSql="insert into 1905_huaxu_detail(uid,content) values (?,?)"
-                addParmas=[uid,cont]
-                await query(addSql,addParmas)
+                await Models.News_detail.create({
+                    content:cont,
+                    create_time:new Date(),
+                    uid,
+                })
              }) 
  
          }

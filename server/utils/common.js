@@ -1,3 +1,7 @@
+
+const superagent=require('superagent')
+const cheerio=require('cheerio')
+
 const CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("")
 
 /**
@@ -54,8 +58,36 @@ const query=(sql,params,callback)=>{
     })
 }
 
+/**
+ * 
+ * @param {string} url  //出去id变化的其他不变部分，可用占位符${id}来暂时替代 ，需要爬虫的目标网页
+ * @param {number} id  //自增规律性id
+ * @param {function} callback 拉取数据后自定义回调函数 
+ * 
+ * 实际中基本只有id总会变化自增
+ */
+function fork(url,callback,id){
+       
+    return async(callback,id)=>{
+             let url1=url
+            if(id) url1=url1.replace('${id}',id)
+            let res=await superagent.get(url1)
+            if(res&&res.text&&res.status==200){
+                var $=cheerio.load(res.text,{decodeEntities:false}) //所有的dom结构
+                await callback&&callback($)
+            }else{
+                console.error('拉取数据失败')
+                console.log(`目前拉取:${id}页`) 
+            }
+       
+    }
+   
+
+}
+
 
 module.exports={
     uuid:guid,
-    query
+    query,
+    fork,
 }

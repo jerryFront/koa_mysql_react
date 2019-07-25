@@ -17,6 +17,8 @@ connectionPool.getConnection(err=>{
     console.log('connect success')
 })
 
+
+
 module.exports=connectionPool
 
 

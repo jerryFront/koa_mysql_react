@@ -11,7 +11,10 @@
      "body-parser":"~1.19.0",
      "mysql":"~2.17.1",
      "http-proxy":"~1.17.0",
-     "cheerio":"~1.0.0-rc.3"
+     "cheerio":"~1.0.0-rc.3",
+     "sequelize":"~5.10.2",
+     "redis": "~2.7.1",
+     "mysql2":"~1.6.5"
    }
 
 }

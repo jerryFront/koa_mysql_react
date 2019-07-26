@@ -9,29 +9,79 @@ const redis_config=require('../config/redisConfig.json')
 
 const clientA=new redis({
     port:6379,
-    db:0
 })
 const clientB=new redis({
     port:6380,
-    db:0
+    flags: "slave"
+})
+
+/**
+ * 将client做为mq的核心分发处理器
+ * 对外统一发布订阅，接收缓存更新 插入client.queue，
+ * 后续模拟两个线程对 queue进行分别处理，加上行锁
+ * 
+ */
+const client=new redis()
+
+client.list=[clientA,clientB]
+client.queue=client.queue||[]
+
+client.on('message',(channel,message)=>{
+    console.log('~~',message,channel)
+})
+
+client.on('error',()=>{
+    client.connect()
 })
 
 
-const stream=clientA.scanStream()
 
 
-stream.on('data',(results)=>{
-    console.log('~~~~~~~')
-    console.log(results)
-    clientA.get('k1',(e,re)=>{
-        console.log(re)
-    })
-})
+/**
+ * 发布: 更新缓存
+ * 支持复杂map/object
+ */
+client.mqSet=obj=>{
 
-clientA.mset({'k1':'v1','k2':'v2'})
+    if(typeof obj!=='object'||(!Object.getOwnPropertyNames(obj).length)) return
+    client.queue.push(obj)
+
+    //后续交给 client.list去模拟多线程处理
+
+    client.list[0].mset(obj)
+
+}
+
+/**
+ * 获取或查询缓存是否命中
+ * 遍历client.list里的列表，查询是否有命中
+ * 由于set最终写入的都是Redis对象 同一处，而不是new出来的，
+ * 所以不需要单独改造get
+ * 
+ */
+// client.mqGet=async key=>{
+// //     if(!client.list||!client.list.length) return
+// //     let arr=client.list.reduce((prev,cur)=>{
+// //         prev.push(cur.get(key))
+// //         return prev
+// //     },[])
+
+// //    let res=await Promise.all(arr)
+
+//    let res=await client.get(key)
+//    console.log(res)
+//    return res
+      
+// }
 
 
-exports.client=clientA
+
+
+
+
+
+
+exports.client=client
 
 
 // client.on('error',err=>{

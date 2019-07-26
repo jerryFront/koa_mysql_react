@@ -3,21 +3,73 @@
  * 
  */
 
-const redis=require('redis')
+const redis=require('ioredis')
 const redis_config=require('../config/redisConfig.json')
 
-const client=redis.createClient(redis_config)
 
-
-const clientA=redis.createClient(6380,redis_config.RedisHost)
-
-client.on('error',err=>{
-    console.error('Redis 连接错误：'+err)
-    process.exit(1)
+const clientA=new redis({
+    port:6379,
+    db:0
+})
+const clientB=new redis({
+    port:6380,
+    db:0
 })
 
 
+const stream=clientA.scanStream()
 
+
+stream.on('data',(results)=>{
+    console.log('~~~~~~~')
+    console.log(results)
+    clientA.get('k1',(e,re)=>{
+        console.log(re)
+    })
+})
+
+clientA.mset({'k1':'v1','k2':'v2'})
+
+
+exports.client=clientA
+
+
+// client.on('error',err=>{
+//     console.error('Redis 连接错误：'+err)
+//     process.exit(1)
+// })
+
+
+/**
+ * redis设计模式
+ * 
+ * 1.设置缓存失效时间，且从不主动删除缓存，直接更新（防止删除时高并发击穿而导致数据库宕机）
+ * 2.读如未命中，则查后写缓存(如未查到也可以用一个默认的缓存)，写如命中，则将其push到消息队列(设置超时时间)，随后异步更新缓存队列
+ * 
+ * 解决缓存并发
+ * 
+ * 这里的并发指的是多个redis的client同时set key引起的并发问题。其实redis自身就是单线程操作，
+ * 多个client并发操作，按照先到先执行的原则，先到的先执行，其余的阻塞。
+ * 当然，另外的解决方案是把redis.set操作放在队列中使其串行化，必须的一个一个执行。
+ * 
+ * 
+ * 缓存预热
+ */
+
+/**
+ * 实现消息队列，并需要设置超时时间
+ * 
+ * 这里将client作为统一管理redis集群的master管理，client发布订阅来更新mq(client)，然后针对mq的每一行设置行锁以及超时时间
+ * 由于多个触发会引发并发执行mq，则要注意mq的length，必须用while执行
+ *
+ */
+
+
+
+/*
+* 获取默认过期时间，单位秒
+* */
+const defaultExpired=parseInt(redis_config.CacheExpired)
 
 /*
 * 设置缓存
@@ -27,14 +79,17 @@ client.on('error',err=>{
 * @param callback回调函数
 * */
 exports.setItem=(key,value,expired,callback)=>{
+    //默认使用系统过期时间
+    expired=expired||defaultExpired
+    
     client.set(key,JSON.stringify(value),err=>{
         if(err){
-            return callback(err)
+            return callback&&callback(err)
         }
         if(expired){
             client.expire(key,expired)
         }
-        return callback(null)
+        return callback&&callback(null)
     })
 }
 
@@ -46,9 +101,9 @@ exports.setItem=(key,value,expired,callback)=>{
 exports.getItem=(key,callback)=>{
     client.get(key,function(err,reply){
         if(err){
-            return callback(err)
+            return callback&&callback(err)
         }
-        return callback(null,JSON.parse(reply))
+        return callback&&callback(null,JSON.parse(reply))
     })
 }
 
@@ -67,10 +122,8 @@ exports.removeItem=(key,callback)=>{
     })
 }
 
-/*
-* 获取默认过期时间，单位秒
-* */
-exports.defaultExpired=parseInt(redis_config.CacheExpired)
+
+
 
 
 /**

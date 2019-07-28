@@ -3,34 +3,43 @@
  * 
  */
 
-const redis=require('ioredis')
+const Redis=require('ioredis')
 const redis_config=require('../config/redisConfig.json')
 
 
-const clientA=new redis({
-    port:6379,
-})
-const clientB=new redis({
-    port:6380,
-    flags: "slave"
-})
+
 
 /**
  * 将client做为mq的核心分发处理器
  * 对外统一发布订阅，接收缓存更新 插入client.queue，
  * 后续模拟两个线程对 queue进行分别处理，加上行锁
  * 
- */
-const client=new redis()
+ * 
+ maxRetriesPerRequest: 1
 
-client.list=[clientA,clientB]
+ */
+const client= new Redis({  //自动连接
+  preferredSlaves:[
+    { host: "localhost", port:6379 },
+    { host: "localhost", port: 6380 }
+  ],
+  maxRetriesPerRequest: 20,
+  });
+
+
+client.exipreWithDefaultTTL = function (key, seconds) {
+    seconds  = seconds || 0;
+    return redis.expire(key, seconds);
+};
+
 client.queue=client.queue||[]
 
 client.on('message',(channel,message)=>{
     console.log('~~',message,channel)
 })
 
-client.on('error',()=>{
+client.on('error',err=>{
+    console.error('Redis 连接错误：'+err)
     client.connect()
 })
 
@@ -40,15 +49,20 @@ client.on('error',()=>{
 /**
  * 发布: 更新缓存
  * 支持复杂map/object
+ * 参数格式 key,value,(exTime)  2/3个 或Object
  */
-client.mqSet=obj=>{
+client.mqSet=(...obj)=>{
 
-    if(typeof obj!=='object'||(!Object.getOwnPropertyNames(obj).length)) return
+    /**支持mset和set两种方式 */
+
+    if(obj.length!=2&&obj.length!=3&&!(typeof obj==='object'&&Object.getOwnPropertyNames(obj[0]).length)) return
     client.queue.push(obj)
 
-    //后续交给 client.list去模拟多线程处理
+    //后续交给 client.list去模拟多线程处理client.queue
 
-    client.list[0].mset(obj)
+    if(obj.length==2) client.set(obj[0],obj[1],'ex',300) //设置默认ex时间
+    else if(obj.length==3) client.set(obj[0],obj[1],'ex',obj[2])
+    else client.mset(obj.shift())
 
 }
 
@@ -59,22 +73,11 @@ client.mqSet=obj=>{
  * 所以不需要单独改造get
  * 
  */
-// client.mqGet=async key=>{
-// //     if(!client.list||!client.list.length) return
-// //     let arr=client.list.reduce((prev,cur)=>{
-// //         prev.push(cur.get(key))
-// //         return prev
-// //     },[])
-
-// //    let res=await Promise.all(arr)
-
-//    let res=await client.get(key)
-//    console.log(res)
-//    return res
-      
-// }
 
 
+// client.mqSet('kk11',334,10)  //设置失效
+// client.mqSet({'kk2':44})
+// client.get('kk11').then(res=>console.log(res))
 
 
 
@@ -84,10 +87,6 @@ client.mqSet=obj=>{
 exports.client=client
 
 
-// client.on('error',err=>{
-//     console.error('Redis 连接错误：'+err)
-//     process.exit(1)
-// })
 
 
 /**
@@ -121,80 +120,10 @@ exports.client=client
 * */
 const defaultExpired=parseInt(redis_config.CacheExpired)
 
-/*
-* 设置缓存
-* @param key 缓存key
-* @param  value缓存value
-* @param expired缓存的有效时长，单位秒
-* @param callback回调函数
-* */
-exports.setItem=(key,value,expired,callback)=>{
-    //默认使用系统过期时间
-    expired=expired||defaultExpired
-    
-    client.set(key,JSON.stringify(value),err=>{
-        if(err){
-            return callback&&callback(err)
-        }
-        if(expired){
-            client.expire(key,expired)
-        }
-        return callback&&callback(null)
-    })
-}
-
-/*
-* 获取缓存
-* @param key缓存key
-* @param callback回调函数
-* */
-exports.getItem=(key,callback)=>{
-    client.get(key,function(err,reply){
-        if(err){
-            return callback&&callback(err)
-        }
-        return callback&&callback(null,JSON.parse(reply))
-    })
-}
-
-
-/*
-* 移除缓存
-* @param key缓存key
-* @param callback回调函数
-* */
-exports.removeItem=(key,callback)=>{
-    client.del(key,function(err){
-        if(err){
-            return callback(err)
-        }
-        return callback(null)
-    })
-}
 
 
 
 
 
-/**
- * 根据对象的属性和值来拼装key
- * 
- */
-exports.generateKey=(prefix,obj)=>{
-   if(typeof prefix==='object'){
-       obj=prefix
-       prefix=undefined
-   }
 
-   var attr,value,key='';
-   for(attr in obj){
-       value=obj[attr]
-       //形如: _name_Tom
-       key+='_'+attr.toString().toLowerCase()+'_'+value.toString()
-   }
-   if(prefix) key=prefix+key;
-   else key=key.substr(1)
 
-   return key
-
-}

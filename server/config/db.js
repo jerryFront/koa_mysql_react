@@ -57,7 +57,7 @@ function defineModel(name,attributes){
                     ++obj.version
                 }
             }
-        }
+        },
     })
 
 }

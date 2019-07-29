@@ -5,10 +5,30 @@
  * 
  */
 
+ const path=require('path')
  const compose=require('koa-compose')
  const Koa=require('koa')
  const app=new Koa()
  const router=require('koa-router')()
+ const koaStatic=require('koa-static') //加载静态资源中间件
+ const staticCache=require('koa-static-cache') //设置静态资源过期策略
+ const bodyParser=require('koa-bodyparser') //表单解析中间件
+
+
+
+
+ //加载静态资源
+ app.use(koaStatic(
+     path.join(__dirname,'./server/public')
+ ))
+
+
+//表单解析大小限制
+app.use(bodyParser({
+    "formLimit":'5mb',
+    "jsonLimit":'5mb',
+    "textLimit":'5mb'
+}))
 
 
   //x-response-time
@@ -43,8 +63,8 @@ const all=compose([
 
 app.use(all)
 
-
-
+//路由相关
+app.use(require('../router/user').routes())
 
 
 

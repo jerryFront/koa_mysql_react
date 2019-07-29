@@ -11,3 +11,8 @@ ORM
 
 2.https://github.com/microsoftarchive/redis/releases 下载redis 3.0+, Redis-x64-3.0.504.zip,后续模拟redis集群
 
+
+
+3.客户端登录后缓存session 的实现机制： koa-mysql-session redis
+
+https://www.cnblogs.com/cangqinglang/p/10266952.html

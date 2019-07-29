@@ -26,8 +26,5 @@ const User=defineModel('Users',{
 
 //创建对应表，如已存在则跳过
 User.sync()
- 
-
-
 
 module.exports=User

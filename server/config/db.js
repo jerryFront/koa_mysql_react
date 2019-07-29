@@ -1,4 +1,5 @@
 const Sequelize=require('sequelize')
+const redis=require('../utils/redis')
 
 /**
  * 
@@ -42,7 +43,7 @@ function defineModel(name,attributes){
     }
 
     //模型返回
-    return connect.define(name,attrs,{
+    const Model=connect.define(name,attrs,{
         tableName:name,
         timestamps:false,
         hooks:{
@@ -59,6 +60,85 @@ function defineModel(name,attributes){
             }
         },
     })
+
+    /**
+     * params为一个object或对应主键的id查询，去匹配params是否含有
+     * 对应Model attrs的主键(或自定义主键) 即attr的unique是否存在，一般unique是设置在主键列上的
+     * 
+     */
+    Model.find=async params=>{
+        if(typeof params!=='string'||typeof params!=='object'){
+            console.error('Find query must be Object or String')
+            return
+        }
+
+        const searchRedis=async key=>{
+           let res=await redis.get(key)
+           if(res) return res 
+           //如redis匹配不到，则查询数据库
+           res = await findInDB() 
+           return res
+        }
+
+        const findInDB=async ()=>{
+          let res = await Model.findAll(params)
+          return res
+        }
+
+        let _key=null
+        //匹配是否需要查询redis命中,string主键 or params只有一个类主键key的
+        if(typeof params==='string'){
+           _key=`${Model}:${params}`
+           return  await searchRedis(_key)
+        } 
+        else if(Object.getOwnPropertyNames(params).length==1){
+            //判断其key是否是unique 主键?
+            if(Object.keys(params).every(it=>{
+                _key=params[it]
+                return !!(attrs[it].unique)
+            })){  //符合规则
+              _key=`${Model}:${_key}`
+              return await searchRedis(_key)
+            }else return await findInDB()
+        }
+
+        else return await findInDB()
+
+    }
+
+    //创建时，可以多传入自定义过期时间
+    Model.create=async (params,ex)=>{
+        if(typeof params!=='object'){
+            console.error('Create query must be Object')
+            return
+        }
+        //寻找主键，primaryKey:true或第一个unique存在的列
+        let res=await Model.create(params)
+        if(res){
+            //更新对应缓存
+            let _key=null,_val=null
+            for(let i in res){
+               if(attrs[i].primaryKey){
+                   _key=i;
+                   _val=res[i]                  
+                   break;
+               }
+               if(attrs[i].unique){
+                    _key=i;
+                    _val=res[i] 
+               }
+            }
+            _key=`${Model}:${_key}`
+            ex?redis.mqSet(_key,_val,ex):redis.mqSet(_key,_val)       
+        }
+        
+        return res 
+
+    }
+
+
+
+    return Model
 
 }
 

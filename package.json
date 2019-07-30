@@ -1,7 +1,7 @@
 {
    "name":"koa_mysql",
-   "script":{
-       "start":"node ./server/compose/app.js"
+   "scripts":{
+       "start":"node ./app.js"
    },
    "dependencies":{
      "koa":"~2.7.0",

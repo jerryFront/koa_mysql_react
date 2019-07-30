@@ -1,8 +1,7 @@
 const router=require('koa-router')()
-const router=require('koa-router')()
-const controller=require('../controller/user')
+const proxy=require('../proxy/user')
 
-router.get('/user/list',controller)
-router.get('/user/get',controller)
+router.all('/user/list',proxy.signIn)
+router.all('/user/get',proxy.signIn)
 
 module.exports=router

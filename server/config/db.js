@@ -1,6 +1,28 @@
 const Sequelize=require('sequelize')
 const redis=require('../utils/redis')
 
+
+
+/**
+ * 将sequelize的类型与es6一一对应
+ * sequelize DateType类型为sequelize的对应OBJ，无法获取其数据类型，只好采取toString
+ */
+const types={
+   'VARCHAR':'string',
+   'CHAR':'string',
+   'DATETIME':'Date',
+   'TEXT':'string',
+   'INT':'number',
+   'BIGINT':'number',
+   'DOUBLE':'number',
+   'BOOLEAN':'boolean',
+   'Array':'object' 
+}
+
+
+
+
+
 /**
  * 
  * @param {string} name  表名 
@@ -131,9 +153,72 @@ function defineModel(name,attributes){
             _key=`${Model}:${_key}`
             ex?redis.mqSet(_key,_val,ex):redis.mqSet(_key,_val)       
         }
-        
+
         return res 
 
+    }
+
+
+
+    /**
+     * 验证传入参数是否缺少和类型是否正确的通用方法
+     * query为get/post接受的提交参数 object
+     * keys为对应方法需要验证的参数名集合
+     * 
+     * return为object  msg：string,result:true
+     */
+    Model.validate=(query,...keys)=>{
+
+       if(typeof query!=='object') 
+       return {
+              msg:'接收数据格式错误',
+              result:false,
+       }
+       
+       let msg=null //错误语
+
+       for(let i=0,l=keys.length;i<l;i++){
+
+    
+            if(!attrs[keys[i]]){ //取不到对应类型,表明是不在数据库对应字段里的，给予通过
+                return true 
+            } 
+            let str=attrs[keys[i]].type||attrs[keys[i]]
+
+            try{
+                str=str.toString() //str类型为sequelize的对应OBJ，无法获取其数据类型，只好采取toString
+                //split去掉 ()
+                if(str) str=str.split('(')[0]
+
+                if(!types[str]){
+                console.error(`类型无法被识别`)
+                return true
+                }
+                if(!query[keys[i]]||typeof query[keys[i]]!==`${types[str]}`){
+                    msg=`${keys[i]}字段类型不符`
+                    break;
+                } 
+
+            }catch(err){
+                console.error(err)
+            }
+    
+
+
+       }
+
+       if(msg) return{
+           msg:res,
+           result:false
+       }
+
+
+       return{
+           msg:null,
+           result:true
+       }
+       
+         
     }
 
 

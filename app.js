@@ -13,6 +13,9 @@
  const staticCache=require('koa-static-cache') //设置静态资源过期策略
  const bodyParser=require('koa-bodyparser') //表单解析中间件
 
+ const checkContext=require('./server/utils/checkController') //鉴权验证
+ const rep=require('./server/utils/response')
+
 
 
 
@@ -52,22 +55,47 @@ async function logger(ctx,next){
     }
 }
 
-async function responsed(ctx,next){
+
+/**
+ * 
+ * @param {*} ctx 
+ * @param {*} next 
+ * 
+ * 作为统一拦截 token和签名校验等使用
+ * 
+ * 需要设置白名单，表示不进行token校验等
+ */
+async function checkController(ctx,next){
+
+    const res=await checkContext.checkCompose(ctx) 
+
+    if(typeof res==='string'){
+
+       ctx.response.body=rep.response(null,res)
+       return
+
+    }
+
+
     await next()
-    if(ctx.url!=='/') return
-    ctx.body='Hello World'
+
+ 
 }
 
 const all=compose([
     responseTime,
     logger,
-    responsed,
+    checkController,
 ])
 
 app.use(all)
 
+
+
+
 //路由相关
 app.use(require('./server/router/user').routes())
+
 
 
 

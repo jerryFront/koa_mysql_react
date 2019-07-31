@@ -28,16 +28,6 @@ const guid=()=>{
 }
 
 
-const compose=(...args)=>{
-    let init=args.shift()
-    return (...arg)=>{
-        return args.reduce((a,b)=>{
-           return a.then(res=>b.apply(nul,res))
-        },Promise.resolve(init.apply(null,arg)))
-    }
-}
-
-
 const connection=require('../config/connect')
 
 /**

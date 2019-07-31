@@ -6,7 +6,10 @@ const User=defineModel('Users',{
         type:seq.STRING(16),
         unique:'uq_t_user' 
     },    
-    name:seq.STRING(50),
+    name:{
+        type:seq.STRING(50),
+        allowNull:true,
+    },    
     password:seq.STRING(50), //密文
     mobile:{
         type:seq.STRING(11),
@@ -16,7 +19,10 @@ const User=defineModel('Users',{
         type:seq.INTEGER(1),
         defaultValue:0,
     },
-    headImg:seq.STRING(50),
+    headImg:{
+        type:seq.STRING(50),
+        allowNull:true,
+    },    
     id:{
        type:seq.INTEGER(10),
        primaryKey:true,
@@ -26,5 +32,6 @@ const User=defineModel('Users',{
 
 //创建对应表，如已存在则跳过
 User.sync()
+
 
 module.exports=User

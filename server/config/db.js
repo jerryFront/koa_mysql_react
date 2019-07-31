@@ -89,7 +89,7 @@ function defineModel(name,attributes){
      * 
      */
     Model.find=async params=>{
-        if(typeof params!=='string'||typeof params!=='object'){
+        if(typeof params!=='string'&&typeof params!=='object'){
             console.error('Find query must be Object or String')
             return
         }
@@ -129,7 +129,7 @@ function defineModel(name,attributes){
     }
 
     //创建时，可以多传入自定义过期时间
-    Model.create=async (params,ex)=>{
+    Model.created=async (params,ex)=>{
         if(typeof params!=='object'){
             console.error('Create query must be Object')
             return
@@ -139,7 +139,7 @@ function defineModel(name,attributes){
         if(res){
             //更新对应缓存
             let _key=null,_val=null
-            for(let i in res){
+            for(let i in attrs){
                if(attrs[i].primaryKey){
                    _key=i;
                    _val=res[i]                  

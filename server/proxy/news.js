@@ -3,6 +3,7 @@ const md5=require('md5')
 const rep=require('../utils/response')
 const redis=require('../utils/redis').client
 const pageConfig=require('../config/common')
+const Op=require('sequelize').Op
 
 const getNewsList=async (req,next)=>{
 
@@ -19,14 +20,19 @@ const getNewsList=async (req,next)=>{
 
   //限制需要分页
 
+  const params={
+    //attributes:{exclude:['id','version','status','updateAt','createAt']},  //去除某些输出列
+    limit:query.limit||pageConfig.limit,
+    offset:(query.limit||pageConfig.limit)*(query.page_num||pageConfig.page_num),
+  }
   
-  const re=await News.findAll({
-    //   where:{
-    //       title:query.title?{$like:`%${query.title}%`}:{},
-    //   },
-      limit:query.limit||pageConfig.limit,
-      offset:(query.limit||pageConfig.limit)*(query.page_num||pageConfig.page_num),
-  })
+  //筛选条件
+  params.where={
+    title:query.title?{[Op.like]:`%${query.title}%`}:{[Op.ne]:null},
+  }
+
+  
+  const re=await News.find(params)
 
   req.response.body=rep.response(re,'0200')
 

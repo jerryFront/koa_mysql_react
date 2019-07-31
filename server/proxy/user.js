@@ -15,6 +15,8 @@ const signIn=async (req,next)=>{
       req.response.body=rep.response(null,'0601',res.msg)
       return
    }
+
+   query.attributes={exclude:['password']}
     
    let re=await User.find(query)
 
@@ -28,8 +30,6 @@ const signIn=async (req,next)=>{
       const key=md5(`${re.id}&&{now}`)
 
       redis.mqSet(key,true,600)  //设置过期时间为10分钟
-
-      delete re.password
 
       re['token']=key
 

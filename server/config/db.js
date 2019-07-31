@@ -1,5 +1,5 @@
 const Sequelize=require('sequelize')
-const redis=require('../utils/redis')
+const redis=require('../utils/redis').connect
 
 
 
@@ -103,7 +103,27 @@ function defineModel(name,attributes){
         }
 
         const findInDB=async ()=>{
-          let res = await Model.findAll(params)
+
+         let res=null  
+            
+          //合并一下params.attributes中的exclude，将通用字段都隐去
+
+          if(typeof params==='object'){
+            const excludes=['version','status','updateAt','createAt']
+            if(params.attributes){
+                //需要合并去重
+                params.attributes.exclude=[...new Set(params.attributes.exclude.concat(excludes))]
+            }else params.attributes={exclude:excludes}
+            res = await Model.findAll(params)
+          }else{
+
+            res = await Model.findById(params)
+
+          }
+          
+        
+
+
           return res
         }
 

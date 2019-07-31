@@ -174,14 +174,20 @@ function defineModel(name,attributes){
               msg:'接收数据格式错误',
               result:false,
        }
+
        
        let msg=null //错误语
 
        for(let i=0,l=keys.length;i<l;i++){
 
+            //如果query没有要检验的字段则直接提示缺少字段
+            if(!query[keys[i]]||typeof query[keys[i]]==='undefined'){
+                msg=`缺少字段${keys[i]}`
+                break;
+            }
     
             if(!attrs[keys[i]]){ //取不到对应类型,表明是不在数据库对应字段里的，给予通过
-                return true 
+                continue;
             } 
             let str=attrs[keys[i]].type||attrs[keys[i]]
 
@@ -192,9 +198,9 @@ function defineModel(name,attributes){
 
                 if(!types[str]){
                 console.error(`类型无法被识别`)
-                return true
+                continue;
                 }
-                if(!query[keys[i]]||typeof query[keys[i]]!==`${types[str]}`){
+                if(typeof query[keys[i]]!==`${types[str]}`){
                     msg=`${keys[i]}字段类型不符`
                     break;
                 } 
@@ -207,8 +213,9 @@ function defineModel(name,attributes){
 
        }
 
+
        if(msg) return{
-           msg:res,
+           msg,
            result:false
        }
 

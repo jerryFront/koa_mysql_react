@@ -14,21 +14,20 @@ const signIn=async (req,next)=>{
    if(!res||!res.result){
       req.response.body=rep.response(null,'0601',res.msg)
       return
-      
    }
     
    let re=await User.find(query)
 
-   if(re.length>0){ //µÇÂ¼³É¹¦£¬ÔòĞ´Èëtoken
-      /**redisĞ´Èëtoken
-       * token²ßÂÔ userid&&timestamp ÔÙmd5
+   if(re.length>0){ //ç™»å½•æˆåŠŸï¼Œåˆ™å†™å…¥token
+      /**rediså†™å…¥token
+       * tokenç­–ç•¥ userid&&timestamp å†md5
        */
-      re=re[0].dataValues //·µ»ØµÄÊÇÒ»¸öUserÊµÌå
+      re=re[0].dataValues //è¿”å›çš„æ˜¯ä¸€ä¸ªUserå®ä½“
 
       const now=new Date().getTime()/1000
       const key=md5(`${re.id}&&{now}`)
 
-      redis.mqSet(key,true,600)  //ÉèÖÃ¹ıÆÚÊ±¼äÎª10·ÖÖÓ
+      redis.mqSet(key,true,600)  //è®¾ç½®è¿‡æœŸæ—¶é—´ä¸º10åˆ†é’Ÿ
 
       delete re.password
 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Blog</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+    <META HTTP-EQUIV="Pragma"CONTENT="no-cache"/>
+    <META HTTP-EQUIV="Cache-Control"CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="500">
+</head>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.11.0/js/md5.min.js"></script>
+<script type="module">
+        var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+        var guid=()=>{
+            var chars = CHARS, uuid = new Array(36), rnd=0, r;
+            for (var i = 0; i < 36; i++) {
+                if (i==8 || i==13 ||  i==18 || i==23) {
+                    uuid[i] = '-';
+                } else if (i==14) {
+                    uuid[i] = '4';
+                } else {
+                    if (rnd <= 0x02) rnd = 0x2000000 + (Math.random()*0x1000000)|0;
+                    r = rnd & 0xf;
+                    rnd = rnd >> 4;
+                    uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+                }
+            }
+            return uuid.join('');
+        }
+
+        let key= 'E41F6E5DBA6W'
+
+        var createHeader=()=>{
+            //鉴权签名算法
+        //SeqNo：唯一请求序列号，客户端识别码(0W代表web端，0I代表ios端，0A代表Android端)+UUID
+            let TimeStamp=parseInt(new Date().getTime()/1000), SeqNo='0W'+guid(),SignTemp,Sign
+            SignTemp='seqno='+SeqNo+'&timestamp='+TimeStamp+'&key='+key
+            Sign=md5(SignTemp)
+
+            return {
+                TimeStamp,
+                SeqNo,
+                Sign
+            }
+        }
+
+
+        getList()
+
+        $('#submit').on('click',()=>{
+            $.ajax({
+                method:'post',
+                url:'/user/login',
+                headers:Object.assign(createHeader(),{source:1,token:sessionStorage.getItem('io-token')}),
+                data:{username:$('#username').val(),password:$('#password').val()},
+                type:'json',
+                success(res){
+                    sessionStorage.setItem('io-token',res.data.token)
+                    getList()
+                } 
+            })
+        })
+
+
+       function getList(){
+
+        $.ajax({
+                method:'post',
+                url:'/news/list',
+                headers:Object.assign(createHeader(),{source:1,token:sessionStorage.getItem('io-token')}),
+                data:{page_num:1,},
+                type:'json',
+                success(res){
+                    console.log(res)
+                } 
+        })
+
+       }
+
+     
+</script>
+<body>
+    <section class="app" id="app">
+        <input id="username" type="text" placeholder="用户名" value='1234'>
+        <input id="password" type="password" placeholder="密码" value='aaaa'>
+        <button id="submit" type="submit">登录</button>
+    </section>
+</body>
+
+</html>

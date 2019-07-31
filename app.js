@@ -96,6 +96,8 @@ app.use(all)
 //路由相关
 app.use(require('./server/router/user').routes())
 
+app.use(require('./server/router/news').routes())
+
 
 
 

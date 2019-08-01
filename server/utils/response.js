@@ -24,7 +24,17 @@
      }
  }
 
+ //统一正确或错误返回
+ const reply=(req,re)=>{
+
+    if(re) req.response.body=response(re,'0200')
+    else req.response.body=response(re,'0601')
+    
+ }
+
+
  module.exports={
      request,
      response,
+     reply,
  }

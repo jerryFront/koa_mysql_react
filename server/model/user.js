@@ -33,11 +33,7 @@ const User=defineModel('Users',{
 //创建对应表，如已存在则跳过
 User.sync()
 
-User.created({
-    username:'1234',
-    password:'aaaa',
-    mobile:'13052525252',
-}) 
+
 
 
 module.exports=User

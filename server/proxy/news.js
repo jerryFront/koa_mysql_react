@@ -1,4 +1,5 @@
 const News=require('../model/news')
+const NewsDetail=require('../model/news_detail')
 const md5=require('md5')
 const rep=require('../utils/response')
 const redis=require('../utils/redis').client
@@ -34,7 +35,25 @@ const getNewsList=async (req,next)=>{
   
   const re=await News.find(params)
 
-  req.response.body=rep.response(re,'0200')
+  rep.reply(req,re)
+
+}
+
+const getNewsDetail=async (req,next)=>{
+
+    let query=rep.request(req)
+
+    const res=News.validate(query,'uid')
+
+    if(!res||!res.result){
+        req.response.body=rep.response(null,'0601',res.msg)
+        return
+    }
+
+    const re=await NewsDetail.find(query.uid)
+
+    rep.reply(req,re)
+
 
 }
 
@@ -42,4 +61,5 @@ const getNewsList=async (req,next)=>{
 
 module.exports={
     getNewsList,
+    getNewsDetail,
 }

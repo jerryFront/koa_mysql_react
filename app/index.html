@@ -70,7 +70,7 @@
                 method:'post',
                 url:'/news/list',
                 headers:Object.assign(createHeader(),{source:1,token:sessionStorage.getItem('io-token')}),
-                data:{page_num:1,},
+                data:{page_num:0,},
                 type:'json',
                 success(res){
                     console.log(res)

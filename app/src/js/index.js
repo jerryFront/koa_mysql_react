@@ -1,9 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {AppContainer} from 'react-hot-loader'
-import Routes from '@configs/router.config'
-import {App} from '@pages/base/index'
-
+import {App,Loader} from '@pages/base/index'
+import '@styles/base.css'
 
 ReactDOM.render(
     <App />,

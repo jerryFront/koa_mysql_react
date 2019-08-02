@@ -32,3 +32,9 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 
  1.配置react webpack环境
  2.初步使用react-hooks
+ 
+2019.8.2
+
+ 1.采用react-router 4.0版本以上的，可以灵活定义Router位置
+ 2.css modules 来加入局部作用域以及模块依赖 (antd必须采用全局css，所以两者要分开打包)
+ 3.postcss 在webpack3以上需要建一个postcss.config.js单独配置

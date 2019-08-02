@@ -55,12 +55,16 @@ const webpackConfigBase = {
             {
               test:/\.(css|less)$/,
               include:[
-                  resolve('../app/styles'),
-                  resolve('../app/components'),
-                  resolve('../node_modules/antd'),
-                  resolve('../node_modules/draft-js'),
+                  resolve('../src'),
               ],
               loader:ExtractTextPlugin.extract({fallback: 'style', use: 'happypack/loader?id=happyStyle'})
+            },
+            {
+                test:/\.(css|less)$/, //antd需要全局编译不能采用css module，所以要分开
+                include:[
+                    resolve('../../node_modules'),
+                ],
+                loader:ExtractTextPlugin.extract({fallback: 'style', use: 'happypack/loader?id=happyGlobalStyle'})
             },
             {
                 test:/\.(woff|eot|ttf|svg|gif)$/,
@@ -79,7 +83,7 @@ const webpackConfigBase = {
             //用id来标识 happypack处理那些类文件
             id:'happyBabel',
             loaders:[{
-                loader:'babel?cacheDirectory=true',
+                loader:'babel?cacheDirectory=true', //重复公共文件缓存
             }],
             // 代表共享进程池，即多个HappyPack实例都是用同一个共享进程池中的子进程去处理任务，以防资源占用过多
             threadPool:happyThreadPool,
@@ -87,11 +91,24 @@ const webpackConfigBase = {
             verbose:true,
         }),
         new HappyPack({
-             id:'happyStyle',
-             loaders:['css-loader?sourceMap=true','less-loader?sourceMap=true'],
+             id:'happyStyle', //css scoped css Module
+             loaders:[
+                 'css-loader?modules?sourceMap=true',
+                 'less-loader?sourceMap=true',
+                 'postcss-loader',
+                ],
              threadPool:happyThreadPool,
              verbose:true,
         }),
+        new HappyPack({
+            id:'happyGlobalStyle', //css scoped
+            loaders:[
+                'css-loader?sourceMap=true',
+                'less-loader?sourceMap=true',
+               ],
+            threadPool:happyThreadPool,
+            verbose:true,
+       }),
         new ExtractTextPlugin(`style.${hash}.css`),
         new webpack.optimize.CommonsChunkPlugin({
             async:'async-common',

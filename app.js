@@ -67,6 +67,18 @@ async function logger(ctx,next){
  */
 async function checkController(ctx,next){
 
+
+    //设置跨域cors
+    ctx.set('Access-Control-Allow-Origin','*')
+    ctx.set('Access-Control-Allow-Methods', 'PUT,DELETE,POST,GET')  //OPTIONS,
+    ctx.set('Access-Control-Allow-Headers', 'seqno,timestamp,sign,Content-Type,token')
+    ctx.set('Access-Control-Allow-Credentials', true);
+
+    if(ctx.method==='OPTIONS'){
+        ctx.response.body=''
+        return
+    } 
+
     const res=await checkContext.checkCompose(ctx) 
 
     if(typeof res==='string'){

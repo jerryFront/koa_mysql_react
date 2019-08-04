@@ -26,6 +26,7 @@ const compose=(...args)=>{
    */
  const whiteList=[
      '/user/login',
+     '/news/list',
 
  ]
 
@@ -50,7 +51,7 @@ const compose=(...args)=>{
     if(!ctx||typeof ctx==='string') return ctx
 
      let header=ctx.request.header
-
+   
 
      /**
       * header里验证 
@@ -69,15 +70,14 @@ const compose=(...args)=>{
       key=key_prefix?keys[key_prefix]:'',
       timestamp=parseInt(new Date().getTime()/1000)
 
-
       if(Math.abs(timestamp-header.timestamp)>120||!key){ //鉴权时间戳要求2分钟之内请求才有效
         
          return '0801'
 
       }
 
-      const sign=md5(`seqno=${header.seqno}&timestamp=${timestamp}&key=${key}`)
-
+      //注意这里取的时间戳是header里带的时间戳
+      const sign=md5(`seqno=${header.seqno}&timestamp=${header.timestamp}&key=${key}`)
 
       if(header.sign!==sign) return '0801'
 
@@ -98,10 +98,8 @@ const compose=(...args)=>{
 
     if(!ctx||typeof ctx==='string'||!ctx.url) return ctx
 
-
-
     /**如果在白名单之列，则不验证token */
-    if(whiteList.some(it=>it.indexOf(ctx.url)>-1)) return true
+    if(whiteList.some(it=>ctx.url.indexOf(it)>-1)) return true
 
     const header =ctx.request.header
 

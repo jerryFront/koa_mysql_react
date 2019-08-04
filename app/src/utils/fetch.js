@@ -2,22 +2,18 @@ import axios from 'axios'
 import React,{useState,useEffect,} from 'react'
 import ReactDOM from 'react-dom'
 import {message,Spin} from 'antd'
-import {timeout,basePath} from '@configs/const'
+import {timeout,rootPath} from '@configs/const'
 import {getStorage,removeStorage} from '@utils/storage'
-import md5 from 'md5'
-import {Loader} from '@pages/base/index'
-
-
-
+const md5=require('md5')
 const qs=require('qs')
 
-const {CancelToken}=axios
+
 
 
 
 const blackList=[
 
-
+ 
 ]
 
 /*
@@ -41,9 +37,9 @@ const beforeHttp=beforeRequest(blackList)
 const baseConfig={
     url:'/',
     method:'get',
-    baseUrl:basePath,
+    baseUrl:rootPath,
     headers:{
-        'Content-Type':'text/plain',
+        'Content-Type':'application/x-www-form-urlencoded',
     },
     timeout,
     widthCredentials:true,
@@ -76,61 +72,108 @@ export default class http{
     return uuid.join('');
   }
 
-  static keys='E41F6E5DBA6W'
+  static key='E41F6E5DBA6W'
 
   static createHeader(){
 
          //鉴权签名算法
         //SeqNo：唯一请求序列号，客户端识别码(0W代表web端，0I代表ios端，0A代表Android端)+UUID
-        let TimeStamp=parseInt(new Date().getTime()/1000), SeqNo='0W'+this.guid(),SignTemp,Sign
-        SignTemp='seqno='+SeqNo+'&timestamp='+TimeStamp+'&key='+this.key
-        Sign=md5(SignTemp)
+        let timestamp=parseInt(new Date().getTime()/1000), seqno='0W'+this.guid(),SignTemp,sign
+        SignTemp=`seqno=${seqno}&timestamp=${timestamp}&key=${this.key}`
+        sign=md5(SignTemp)
 
         return {
-            TimeStamp,
-            SeqNo,
-            Sign
+            timestamp,
+            seqno,
+            sign
         }
   }
 
 
   //采用hooks处理方式
-  static async request(url,data){
+  static request(args){
 
-    const userheader=getStorage('user_info')
-    baseConfig.headers={...baseConfig.headers,...this.createHeader(),...userheader}
-    baseConfig.url=url
-    baseConfig.data=data
+    const [url,data]=args 
+  
+    const [isLoading,setIsLoading]=useState(false)
+    const [res,setRes]=useState(null)
+    const [error,setError]=useState(null)
+
+    const isPost=baseConfig.method==='post'?true:false
+
+    const fetch=async ()=>{
+
+      if(!beforeHttp(url,data)) return
+
+      const userheader=getStorage('user_info')||{token:''}
+      baseConfig.headers={...baseConfig.headers,...this.createHeader(),...userheader}
+      baseConfig.url=`${rootPath}${url}`
+      if(isPost) baseConfig.data=qs.stringify(data)
+      else baseConfig.params=data
+
+      if(isLoading) return
+      setIsLoading(true)
+
+      try{
+
+ 
+        let res=await axios(baseConfig).then(res=>res.data)
+
+        setIsLoading(false)
+ 
+        /**
+         * 判断通用错误
+         * 1.无返回
+         * 2.鉴权失败
+         * 3.token错误
+         */
+
+        if(!res||typeof res!=='object'||!Object.keys(res).length){
+          message.error('未获取到数据信息，请稍后再试',10)
+          return
+        }
+        if(res.code&&res.code===801){
+          message.error('请求包含的鉴权信息不合法，请重试',6)
+          return
+        } 
+        if(res.code&&res.code===802){
+          message.error('Token令牌已过期，请重新登录',6)
+          return
+        }
+
+        setRes(res)
+
+      }catch(e){
+        setIsLoading(false)
+        setError(e)   
+      }
+
+
+    }
+  
     
-
-    const [res,setRes]=useState({
-        status:'pending',
-        data:null,
-        error:null,
-    })
-
 
     useEffect(()=>{
 
-      let aborted=false
-     
-      ReactDOM.render(
-        <Loader />,
-        document.getElementById('app')
-    )
-      
+      console.log(url,data)
 
+      fetch() 
+   
+    },[])
 
-
-      return ()=>{
-          aborted=true
-      }
-        
-    },[url,data])
-
-
+     return [isLoading,res,error]
 
   }
+
+  static get(...args){
+    baseConfig.method='get'
+    return this.request(args)
+  }
+
+  static post(...args){
+    baseConfig.method='post'
+    return this.request(args)
+  } 
 
 
 

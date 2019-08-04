@@ -13,8 +13,10 @@ export const app_version='1.0.0'
 
 export const env =process.env.NODE_ENV||'development'
 
+
+
 const hosts = {
-    development: 'https://localhost:4000/',
+    development: 'http://localhost:4000/',
     test: 'https://t.web.joyincar.cn/',
     production: 'https://web.joyincar.cn/'
 }

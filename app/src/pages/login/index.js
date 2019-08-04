@@ -8,12 +8,17 @@ import styles from './index.less'
 export default ()=>{
 
     const [num,setNum]=useState(0)
-    const [kk,setKk]=useState(5)
+    const [params,setParams]=useState({page_num:0})
 
-    const [isLoading,res,error]=http.post('news/list',{'page_num':num})
+
+
+    const [isLoading,res,error]=http.post('news/list',{page_num:num})
+
+    
 
     useEffect(()=>{
         
+
     })
 
  
@@ -25,7 +30,7 @@ export default ()=>{
 
            <section className={styles.leftContainer}>
 
-                登录
+                登录 {res&&res.length}
 
            </section>
 
@@ -34,9 +39,6 @@ export default ()=>{
                
            <p>You clicked {num} times</p>
             <button onClick={()=>setNum(num+1)}>点击</button>
-
-            <p>You clicked {kk} times</p>
-            <button onClick={()=>setKk(num+1)}>点击</button>
                
            </section>  
 

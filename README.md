@@ -38,3 +38,7 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
  1.采用react-router 4.0版本以上的，可以灵活定义Router位置
  2.css modules 来加入局部作用域以及模块依赖 (antd必须采用全局css，所以两者要分开打包)
  3.postcss 在webpack3以上需要建一个postcss.config.js单独配置
+
+ 2019.8.4
+
+ useEffect的不作为componentDidUnmount的话，传入第二个参数时一定注意：第二个参数不能为引用类型，引用类型比较不出来数据的变化，会造成死循环

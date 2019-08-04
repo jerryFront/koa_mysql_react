@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React,{useState,useEffect,} from 'react'
+import React,{useState,useEffect,useCallback} from 'react'
 import ReactDOM from 'react-dom'
 import {message,Spin} from 'antd'
 import {timeout,rootPath} from '@configs/const'
@@ -93,15 +93,18 @@ export default class http{
   //采用hooks处理方式
   static request(args){
 
-    const [url,data]=args 
+    const [url]=args 
+
+    const [data]=useState(args[1])
   
     const [isLoading,setIsLoading]=useState(false)
     const [res,setRes]=useState(null)
     const [error,setError]=useState(null)
 
     const isPost=baseConfig.method==='post'?true:false
+    
 
-    const fetch=async ()=>{
+    const fetch=useCallback(async ()=>{
 
       if(!beforeHttp(url,data)) return
 
@@ -141,7 +144,11 @@ export default class http{
           return
         }
 
-        setRes(res)
+        if(res.code&&res.code!==200){
+          message.error(res.msg,6)
+          return
+        } 
+        setRes(res.data)
 
       }catch(e){
         setIsLoading(false)
@@ -149,9 +156,8 @@ export default class http{
       }
 
 
-    }
-  
-    
+    },[data])
+      
 
     useEffect(()=>{
 
@@ -159,7 +165,7 @@ export default class http{
 
       fetch() 
    
-    },[])
+    },[fetch])
 
      return [isLoading,res,error]
 
@@ -174,6 +180,7 @@ export default class http{
     baseConfig.method='post'
     return this.request(args)
   } 
+
 
 
 

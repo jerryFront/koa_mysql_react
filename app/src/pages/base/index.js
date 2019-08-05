@@ -89,5 +89,4 @@ export function Loader(){
 
 }
 
-console.log(React.createElement(Loader()))
 

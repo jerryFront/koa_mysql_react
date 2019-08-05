@@ -37,6 +37,7 @@ const webpackConfigBase = {
             '@pages': path.join(__dirname, '../src/pages'),
             '@utils':path.join(__dirname,'../src/utils'),
             '@html':path.join(__dirname,'../src/html'),
+            '@reducers':path.join(__dirname,'../src/js/reducers'),
 
         }
     },

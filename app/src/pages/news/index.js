@@ -1,48 +1,44 @@
-import  React from 'react'
-import {useRef,useState,useEffect} from 'react'
+import  React,{useRef,useState,useEffect,useContext} from 'react'
+import  {commonContext} from '@pages/base/index'
+import  http from '@utils/fetch'
 
-import {useEventListener} from '@utils/hooks'
+
 
 import styles from './index.less'
 
 export default ()=>{
+   
+  const initData={
+    page_num:0,
+  }
 
-    const [num,setNum]=useState(1)
-    const [kk,setKk]=useState(5)
+  const [data,setData]=useState(initData)
 
-    const [eventName,setEventName]=useState('click')
-    useEventListener(eventName,()=>{console.log(eventName)})
+  // const ctx=useContext(commonContext)
 
 
+  // useEffect(()=>{
 
-    const aa=useRef(null)
+  //   ctx.dispatch({type:'set_common_loading'})
 
-    useEffect(()=>{
-      setEventName(eventName=='click'?'click1':'click')   
-      console.log(num)
+  // },[data])
 
-    },[num])
+
+  const [isLoading,res,error,setParams]=http.post('news/list',data)
+  
+  
+
+
+
+
 
     return (
         <section className={styles.container}>
 
-           <section className={styles.leftContainer}>
+          <button onClick={()=>{ ctx.dispatch({type:'set_common_loading'})}}>点击</button>
 
-                导航区
-
-           </section>
-
-
-           <section className={styles.rightContainer}>
-               
-           <p>You clicked {num} times</p>
-            <button onClick={()=>setNum(num+1)}>点击</button>
-
-            <p>You clicked {kk} times</p>
-            <button onClick={()=>setKk(num+1)}>点击</button>
-               
-           </section>  
-
+          
+           something is ready!
 
 
         </section>

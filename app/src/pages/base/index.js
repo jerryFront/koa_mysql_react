@@ -1,4 +1,4 @@
-import  React from 'react'
+import  React,{useReducer} from 'react'
 // v4 中改从 'react-router-dom'引入
 
 /**
@@ -14,24 +14,44 @@ import {Spin} from 'antd'
 import Login from '@pages/login/index'
 import News from '@pages/news/index'
 import {isLogin} from './common'
+import {commonReducer} from '@reducers/common'
 
 
 
+export const commonContext=React.createContext(null)
+
+
+/**
+ * 不同的总路由页面采用不同的reducer数据
+ * 然后fetch去对应的dispatch
+ **/
+const comReducer=()=>{
+    const [commonState,dispatch]=useReducer(commonReducer,{
+        isFetching:false,
+        isLoading:false,
+    })
+
+    return [commonState,dispatch]
+}
+
+
+/**
+ *最外层加loading会引起层层重复渲染 
+ * {commonState.isLoading&&<Loader />}  
+ *  */
 
 //主要的路由表结构
 const PrimaryLayout=()=>{
-   
+
+    const [commonState,dispatch]=comReducer()
+
     return(
+     
+    <commonContext.Provider value={{commonState,dispatch}}>
     <section className={styles.container}>
-        <section className={styles.leftContainer}>
-             菜单栏 
-        </section>
-        <section className={styles.rightContainer}>
-            内容区域
-
-        </section>
+       <News></News>
     </section>
-
+    </commonContext.Provider>    
     )
 }
 
@@ -48,7 +68,7 @@ export function App(){
        <HashRouter>
           <Switch>
               <Route path="/" exact render={()=>(
-                 isLogin()?(<PrimaryLayout />):(<Redirect to="/login" />)
+                 !isLogin()?(<PrimaryLayout />):(<Redirect to="/login" />)
               )}></Route> 
               <Route path="/login"  component={Login}></Route>
               <Route path="/news" exact component={News}></Route>
@@ -68,4 +88,6 @@ export function Loader(){
     )
 
 }
+
+console.log(React.createElement(Loader()))
 

@@ -41,4 +41,12 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 
  2019.8.4
 
- useEffect的不作为componentDidUnmount的话，传入第二个参数时一定注意：第二个参数不能为引用类型，引用类型比较不出来数据的变化，会造成死循环
+ useEffect的不作为componentDidUnmount的话，传入第二个参数时一定注意：第二个参数不能为引用类型，引用类型比较不出来数据的变化，会造成死循环（实际是因为里面console了data）
+
+2019.8.5
+
+1.options请求类同普通请求；
+2.useEffect频繁触发是因为console了data，用useCallback必须将data作为hooks相关来引入；
+3.将setData作为回调返回给业务函数
+4.react是jsx，如果loading放在最外层，则自组件触发dispatch的时候，会重复循环渲染
+

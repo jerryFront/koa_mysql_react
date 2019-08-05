@@ -1,9 +1,12 @@
 import axios from 'axios'
 import React,{useState,useEffect,useCallback} from 'react'
 import ReactDOM from 'react-dom'
-import {message,Spin} from 'antd'
+import {message} from 'antd'
 import {timeout,rootPath} from '@configs/const'
 import {getStorage,removeStorage} from '@utils/storage'
+import {Loader} from '@pages/base/index'
+
+
 const md5=require('md5')
 const qs=require('qs')
 
@@ -53,6 +56,7 @@ const baseConfig={
 
 export default class http{
 
+  ReactDOM
 
 
   static guid(){
@@ -93,6 +97,7 @@ export default class http{
   //采用hooks处理方式
   static request(args){
 
+    
     const [url]=args 
 
     //需要监听data变化的时候，必须设置其为hook相关
@@ -105,6 +110,23 @@ export default class http{
     const [error,setError]=useState(null)
 
     const isPost=baseConfig.method==='post'?true:false
+
+
+    //暂时用dom去创建loading加载
+
+    useEffect(()=>{
+
+      const loading=document.getElementById('loading')
+      if(isLoading){
+        loading.setAttribute('style','display:block')
+      }else{
+        setTimeout(()=>{
+          loading.setAttribute('style','display:none')
+        },500)
+
+      }
+
+    },[isLoading])
     
 
     const fetch=useCallback(async ()=>{

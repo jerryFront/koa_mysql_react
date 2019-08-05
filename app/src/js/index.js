@@ -7,3 +7,5 @@ ReactDOM.render(
     <App />,
     document.getElementById('app')
 )
+
+ReactDOM.render(<Loader />,document.getElementById('loading'))

@@ -74,10 +74,10 @@ async function checkController(ctx,next){
     ctx.set('Access-Control-Allow-Headers', 'seqno,timestamp,sign,Content-Type,token')
     ctx.set('Access-Control-Allow-Credentials', true);
 
-    if(ctx.method==='OPTIONS'){
-        ctx.response.body=''
-        return
-    } 
+    // if(ctx.method==='OPTIONS'){
+    //     ctx.response.body=''
+    //     return
+    // } 
 
     const res=await checkContext.checkCompose(ctx) 
 

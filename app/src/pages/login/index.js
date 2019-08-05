@@ -1,5 +1,5 @@
 import  React from 'react'
-import {useRef,useState,useEffect} from 'react'
+import {useRef,useState,useLayoutEffect} from 'react'
 
 import http from '@utils/fetch'
 
@@ -8,18 +8,17 @@ import styles from './index.less'
 export default ()=>{
 
     const [num,setNum]=useState(0)
-    const [params,setParams]=useState({page_num:0})
 
 
 
-    const [isLoading,res,error]=http.post('news/list',{page_num:num})
+    const [isLoading,res,error,setParams]=http.post('news/list',{page_num:num})
 
     
 
-    useEffect(()=>{
-        
-
-    })
+    useLayoutEffect(()=>{
+       setParams({page_num:num}) 
+ 
+    },[num])
 
  
 

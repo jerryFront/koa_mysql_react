@@ -95,8 +95,11 @@ export default class http{
 
     const [url]=args 
 
-    const [data]=useState(args[1])
-  
+    //需要监听data变化的时候，必须设置其为hook相关
+    const [data,setData]=useState(args[1])
+
+    // const data=useRef(args[1])
+
     const [isLoading,setIsLoading]=useState(false)
     const [res,setRes]=useState(null)
     const [error,setError]=useState(null)
@@ -161,13 +164,11 @@ export default class http{
 
     useEffect(()=>{
 
-      console.log(url,data)
-
       fetch() 
    
     },[fetch])
 
-     return [isLoading,res,error]
+     return [isLoading,res,error,setData]
 
   }
 

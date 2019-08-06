@@ -11,7 +11,7 @@ const News=defineModel('Cure_news',{
     },
     thumb_img:seq.STRING(200),
     thumb_content:seq.STRING(2000),
-    create_time:seq.DATE,
+    thumb_time:seq.STRING(20),
 })
 
 News.sync()

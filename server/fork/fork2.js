@@ -19,21 +19,21 @@ const Models=require('../model')
 var id=1
 const fork1=fork('http://cntuku.com/huaxu/page/${id}')
 const cb=async $=>{
-    await $('#main article').each(async function(){
+    await $('.posts-loop .category-huaxu').each(async function(){
  
          //将其内容一并爬出来存入content内容中
-         var href=$(this).find('.load a').attr('href')
+         var href=$(this).find('.thumbnail-link').attr('href')
  
          
-         var newsTitle = $(this).find('header h2 a').text();
-         var content = $(this).find('.archive-content').text();
-         var newsTime=new Date();
-         var newsImg= $(this).find('.load a img').attr('src');
+         var newsTitle = $(this).find('.entry-title h2 a').text();
+         var content = $(this).find('.entry-summary').text();
+         var newsTime=$(this).find('.entry-date').text();
+         var newsImg= $(this).find('.thumbnail-wrap img').attr('src');
          var uid=uuid()
  
          var news=await Models.News.create({
              title:newsTitle,
-             create_time:new Date(),
+             thumb_time:newsTime,
              thumb_img:newsImg,
              thumb_content:content,
              uid,
@@ -42,8 +42,8 @@ const cb=async $=>{
          if(news){
              
              fork(href)(async $1=>{
-                let cont=$1('.single-content')
-                cont.find('.tg-pc').remove()
+                let cont=$1('.entry-content')
+                // cont.find('.tg-pc').remove()
                 cont=cont.html()
  
                 await Models.News_detail.create({

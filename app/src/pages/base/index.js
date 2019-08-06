@@ -81,12 +81,11 @@ export function App(){
 export function Loader(){
 
     return (
-        <Spin tip="Loading...">
+        <Spin tip="Loading..."  size="large">
         <div className={styles.container}>
         </div>
         </Spin>
     )
 
 }
-
 

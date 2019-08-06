@@ -26,24 +26,30 @@ export default ()=>{
     if(res&&res.length) list=list.concat(res)
 
     if(list&&list.length) return (
-    // <List className="main-list"
-    //  loading={isLoading} itemLayout="horizontal"
-    //  dataSource={list}
-    //  renderItem={item=>(
-    //   <List.Item>
-    //     <Skeleton title={false} active>
-    //         {/* <List.Item.Meta title={item.title}>
-    //           </List.Item.Meta>  */}
-    //     {item.content}      
-    //     </Skeleton>
-    //   </List.Item> 
-    //  )}
-    // >
-    // </List>
+    <List className="main-list"
+     loading={isLoading} itemLayout="horizontal"
+     dataSource={list}
+     renderItem={item=>(
+      <List.Item>
+        <Skeleton avatar title loading={isLoading} description>
+             <List.Item.Meta  
+             avatar={
+               <img src={item.thumb_img} />
+             }
+             title={item.title} 
+             description={item.thumb_content}
+              />
+            
+        </Skeleton>
+    
+      </List.Item> 
+     )}
+    >
+    </List>
 
-    list.map((item,key)=>(
-      <div>{item.title}</div>
-    ))
+    // list.map((item,key)=>(
+    //   <div key={key}>{item.title}</div>
+    // ))
 
     )
     else return null

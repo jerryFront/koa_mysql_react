@@ -27,6 +27,7 @@ const compose=(...args)=>{
  const whiteList=[
      '/user/login',
      '/news/list',
+     '/news/getDetail',
 
  ]
 

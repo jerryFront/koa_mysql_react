@@ -1,5 +1,6 @@
 import  React,{useRef,useState,useEffect,useContext} from 'react'
 import {Layout,Row,Col,List,Skeleton} from 'antd'
+import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
 
 
@@ -14,6 +15,7 @@ export default ()=>{
   let list=[]
 
 
+
   const [isLoading,res,error,setParams]=http.post('news/list',initData)
   
   
@@ -21,9 +23,11 @@ export default ()=>{
   const {Header,Footer,Content}=Layout
 
 
+
+
   const RenderList=({res})=>{
 
-    if(res&&res.length) list=list.concat(res)
+    if(res&&res.rows&&res.rows.length) list=list.concat(res.rows)
 
     if(list&&list.length) return (
     <List className="main-list"
@@ -37,7 +41,12 @@ export default ()=>{
                <img src={item.thumb_img} />
              }
              title={item.title} 
-             description={item.thumb_content}
+             description={
+             <Link to={`/news/detail/${item.id}`}>
+             <h6>{item.thumb_time}</h6>
+             <div>{item.thumb_content}</div>
+             </Link>  
+            }
               />
             
         </Skeleton>
@@ -47,9 +56,7 @@ export default ()=>{
     >
     </List>
 
-    // list.map((item,key)=>(
-    //   <div key={key}>{item.title}</div>
-    // ))
+ 
 
     )
     else return null

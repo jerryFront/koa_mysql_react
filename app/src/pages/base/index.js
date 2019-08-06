@@ -13,6 +13,7 @@ import styles from './index.less'
 import {Spin} from 'antd'
 import Login from '@pages/login/index'
 import News from '@pages/news/index'
+import NewsDetail from '@pages/news/detail'
 import {isLogin} from './common'
 import {commonReducer} from '@reducers/common'
 
@@ -72,6 +73,7 @@ export function App(){
               )}></Route> 
               <Route path="/login"  component={Login}></Route>
               <Route path="/news" exact component={News}></Route>
+              <Route path="/news/detail/:id" component={NewsDetail}></Route>
               <Redirect to="/" />
           </Switch>
        </HashRouter>

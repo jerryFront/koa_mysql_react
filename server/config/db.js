@@ -1,5 +1,5 @@
 const Sequelize=require('sequelize')
-const redis=require('../utils/redis').connect
+const redis=require('../utils/redis').client
 
 
 
@@ -30,15 +30,15 @@ const types={
  */
 function defineModel(name,attributes){
     var attrs={}
-    for(let key in attributes){
+    for(let key in attributes){ //默认均改为允许为空
         let value=attributes[key]
         if(typeof value==='object'&&value['type']){ //此时value即为type
-            value.allowNull=value.allowNull||false
+            value.allowNull=value.allowNull||true
             attrs[key]=value
         }else{
             attrs[key]={
                 type:value,
-                allowNull:false,
+                allowNull:true,
             }
         }
     }
@@ -117,8 +117,8 @@ function defineModel(name,attributes){
             res = await Model.findAll(params)
           }else{
 
-            res = await Model.findById(params)
-
+            res = await Model.findByPk(params)  //没有findById此方法，百度坑
+  
           }
           
         
@@ -130,7 +130,7 @@ function defineModel(name,attributes){
         let _key=null
         //匹配是否需要查询redis命中,string主键 or params只有一个类主键key的
         if(typeof params==='string'){
-           _key=`${Model}:${params}`
+           _key=`${name}:${params}`
            return  await searchRedis(_key)
         } 
         else if(Object.getOwnPropertyNames(params).length==1){
@@ -147,6 +147,32 @@ function defineModel(name,attributes){
         else return await findInDB()
 
     }
+
+    
+    //用于列表请求分页相关,不走redis(列表数据更新很快，走redis无意义)
+    Model.findAllCount=async params=>{
+
+        if(typeof params!=='object'){
+            console.error('Find query must be Object or String')
+            return
+        }
+
+        if(typeof params==='object'){
+            const excludes=['version','status','updateAt','createAt']
+            if(params.attributes){
+                //需要合并去重
+                params.attributes.exclude=[...new Set(params.attributes.exclude.concat(excludes))]
+            }else params.attributes={exclude:excludes}
+            params.attributes.distinct=true //除去因为include等造成的重复
+            res = await Model.findAndCountAll(params) //不叫findAllAndCount
+            return res
+
+          }
+
+
+
+    }
+
 
     //创建时，可以多传入自定义过期时间
     Model.created=async (params,ex)=>{

@@ -33,7 +33,7 @@ const getNewsList=async (req,next)=>{
   }
 
   
-  const re=await News.find(params)
+  const re=await News.findAllCount(params)
 
   rep.reply(req,re)
 

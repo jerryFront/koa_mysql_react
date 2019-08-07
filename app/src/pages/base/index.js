@@ -1,4 +1,4 @@
-import  React,{useReducer} from 'react'
+import  React,{useReducer,lazy,Suspense} from 'react'
 // v4 中改从 'react-router-dom'引入
 
 /**
@@ -7,15 +7,29 @@ import  React,{useReducer} from 'react'
   createMemoryHistory
  */
 import {BrowserRouter,HashRouter,Route,Switch,Redirect} from 'react-router-dom'
+import Loadable from 'react-loadable' //懒加载
 
 import styles from './index.less'
-
 import {Spin} from 'antd'
-import Login from '@pages/login/index'
-import News from '@pages/news/index'
-import NewsDetail from '@pages/news/detail'
 import {isLogin} from './common'
 import {commonReducer} from '@reducers/common'
+
+
+/**动态加载组件 */
+const loadableComponent=path=>{
+    return lazy(()=>import(path))
+    // return Loadable({
+    //     loader:()=>import(`${path}`),
+    //     loading:Loader,
+    // })
+}
+
+const Login=loadableComponent('@pages/login/index')
+const News=loadableComponent('@pages/news/index')
+const NewsDetail=loadableComponent('@pages/news/detail')
+
+
+
 
 
 
@@ -50,7 +64,9 @@ const PrimaryLayout=()=>{
      
     <commonContext.Provider value={{commonState,dispatch}}>
     <section className={styles.container}>
-       <News></News>
+        <Suspense fallback={<Loader/>}>
+          <News></News>
+        </Suspense>
     </section>
     </commonContext.Provider>    
     )
@@ -71,9 +87,14 @@ export function App(){
               <Route path="/" exact render={()=>(
                  !isLogin()?(<PrimaryLayout />):(<Redirect to="/login" />)
               )}></Route> 
+  
+
               <Route path="/login"  component={Login}></Route>
               <Route path="/news" exact component={News}></Route>
               <Route path="/news/detail/:id" component={NewsDetail}></Route>
+              
+            
+             
               <Redirect to="/" />
           </Switch>
        </HashRouter>

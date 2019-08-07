@@ -53,5 +53,6 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 
 2019.8.7
 
-1.lazy类似利用webpack新特性实现懒加载（初步规划）
+1.lazy/react-loadable/@loadable/component 利用webpack新特性实现懒加载
+2.特别注意动态import(webpack语法)的实际执行(path只能中间部分动态变化，利用include来减少全局搜索的文件类型)
 

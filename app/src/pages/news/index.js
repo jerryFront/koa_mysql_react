@@ -42,7 +42,7 @@ export default ()=>{
              }
              title={item.title} 
              description={
-             <Link to={`/news/detail/${item.id}`}>
+             <Link to={`/news/detail/${item.uid}`}>
              <h6>{item.thumb_time}</h6>
              <div>{item.thumb_content}</div>
              </Link>  

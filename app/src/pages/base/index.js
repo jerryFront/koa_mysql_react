@@ -1,4 +1,4 @@
-import  React,{useReducer,lazy,Suspense} from 'react'
+import  React,{useReducer} from 'react'
 // v4 中改从 'react-router-dom'引入
 
 /**
@@ -8,6 +8,7 @@ import  React,{useReducer,lazy,Suspense} from 'react'
  */
 import {BrowserRouter,HashRouter,Route,Switch,Redirect} from 'react-router-dom'
 import Loadable from 'react-loadable' //懒加载
+// import loadable from '@loadable/component'
 
 import styles from './index.less'
 import {Spin} from 'antd'
@@ -15,21 +16,24 @@ import {isLogin} from './common'
 import {commonReducer} from '@reducers/common'
 
 
-/**动态加载组件 */
-const loadableComponent=path=>{
-    return lazy(()=>import(path))
-    // return Loadable({
-    //     loader:()=>import(`${path}`),
-    //     loading:Loader,
-    // })
+/**动态加载组件
+ * 
+ * import('./app'+path+'/util') => /^\.\/app.*\/util$/
+也就是说，import参数中的所有变量，都会被替换为【.*】，
+而webpack就根据这个正则，查找所有符合条件的包，将其作为package进行打包。
+
+webpackIgnore: Disables dynamic import parsing when set to true.
+Note that setting webpackIgnore to true opts out of code splitting.
+
+特别注意动态import 它默认会找所有的Include类型文件进行匹配,且需要指定前半部分文件夹，来缩小匹配范围
+ * 
+ */
+const AsyncPage=path=>{
+    return Loadable({
+        loader:()=>import(/* webpackInclude: /\.js$/ */ `@pages/${path}`),
+        loading:Loader,
+    })
 }
-
-const Login=loadableComponent('@pages/login/index')
-const News=loadableComponent('@pages/news/index')
-const NewsDetail=loadableComponent('@pages/news/detail')
-
-
-
 
 
 
@@ -64,9 +68,7 @@ const PrimaryLayout=()=>{
      
     <commonContext.Provider value={{commonState,dispatch}}>
     <section className={styles.container}>
-        <Suspense fallback={<Loader/>}>
-          <News></News>
-        </Suspense>
+          {AsyncPage('news/index')}
     </section>
     </commonContext.Provider>    
     )
@@ -89,9 +91,9 @@ export function App(){
               )}></Route> 
   
 
-              <Route path="/login"  component={Login}></Route>
-              <Route path="/news" exact component={News}></Route>
-              <Route path="/news/detail/:id" component={NewsDetail}></Route>
+              <Route path="/login"  component={AsyncPage('login/index')}></Route>
+              <Route path="/news" exact component={AsyncPage('news/index')}></Route>
+              <Route path="/news/detail/:uid" component={AsyncPage('news/detail')}></Route>
               
             
              

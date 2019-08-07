@@ -121,9 +121,6 @@ function defineModel(name,attributes){
   
           }
           
-        
-
-
           return res
         }
 

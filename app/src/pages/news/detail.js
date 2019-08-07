@@ -7,10 +7,10 @@ import  http from '@utils/fetch'
 
 import styles from './index.less'
 
-export default ()=>{
+export default props=>{
    
   const initData={
-    uid:'4F3FE3A4-7349-41CA-B0C3-DC93F6A6F1F4',
+    uid:props.match.params.uid,
   }
 
 

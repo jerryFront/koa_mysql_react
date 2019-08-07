@@ -50,7 +50,12 @@ const getNewsDetail=async (req,next)=>{
         return
     }
 
-    const re=await NewsDetail.find(query.uid)
+    query.where={
+      uid:query.uid,
+    }
+
+    let re=await NewsDetail.find(query)
+    if(re&&re.length) re=re[0]
 
     rep.reply(req,re)
 

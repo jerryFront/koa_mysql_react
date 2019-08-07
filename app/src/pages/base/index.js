@@ -3,10 +3,10 @@ import  React,{useReducer} from 'react'
 
 /**
  *hashHistory
-  browserHistory
+  browserHistory (没有#)
   createMemoryHistory
  */
-import {BrowserRouter,HashRouter,Route,Switch,Redirect} from 'react-router-dom'
+import {HashRouter,Route,Switch,Redirect,withRouter} from 'react-router-dom'
 import Loadable from 'react-loadable' //懒加载
 // import loadable from '@loadable/component'
 
@@ -29,10 +29,14 @@ Note that setting webpackIgnore to true opts out of code splitting.
  * 
  */
 const AsyncPage=path=>{
-    return Loadable({
+    /**
+     * 返回的动态Component可以经过多重高阶组件的增强compose
+     * withRouter是给props添加match.params 方便获取路由参数
+     */
+    return withRouter(Loadable({
         loader:()=>import(/* webpackInclude: /\.js$/ */ `@pages/${path}`),
         loading:Loader,
-    })
+    }))
 }
 
 

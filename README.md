@@ -50,3 +50,8 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 3.将setData作为回调返回给业务函数
 4.react是jsx，如果loading放在最外层，则自组件触发dispatch的时候，会重复循环渲染
 
+
+2019.8.7
+
+1.lazy类似利用webpack新特性实现懒加载（初步规划）
+

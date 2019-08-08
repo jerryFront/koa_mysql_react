@@ -51,7 +51,7 @@ async function logger(ctx,next){
     await next()
     const ms=new Date()-start
     if(process.env.NODE_ENV!=='test'){
-        console.log('%s %s - %s',ctx.method,ctx.url,ms);
+        console.log('%s %s -http_status %s - %sms',ctx.method,ctx.url,ctx.status,ms);
     }
 }
 

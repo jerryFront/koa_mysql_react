@@ -1,6 +1,5 @@
 import  React,{useRef,useState,useEffect,useContext} from 'react'
-import {Layout,Row,Col,List,Skeleton} from 'antd'
-import { Link } from 'react-router-dom'
+import {Layout,Row,Col,Card} from 'antd'
 import  http from '@utils/fetch'
 
 
@@ -22,35 +21,9 @@ export default props=>{
 
   const {Header,Footer,Content}=Layout
 
+  
 
 
-
-  const RenderDetail=({res})=>{
-
-    // if(res&&res.rows&&res.rows.length) list=list.concat(res.rows)
-
-    // if(list&&list.length) return (
-
-    //     <Skeleton avatar title loading={isLoading} description>
-    //          <List.Item.Meta  
-    //          avatar={
-    //            <img src={item.thumb_img} />
-    //          }
-    //          title={item.title} 
-    //          description={
-    //          <Link to={`/news/detail/${item.id}`}>
-    //          <h6>{item.thumb_time}</h6>
-    //          <div>{item.thumb_content}</div>
-    //          </Link>  
-    //         }
-    //           />
-            
-    //     </Skeleton>
-
-    // )
-    // else return null
-    
-  }
 
     return (
         <section className={styles.container}>
@@ -60,11 +33,20 @@ export default props=>{
             详情页
           </Header>
           <Content>
-            
+              
               <Row>
                 <Col lg={24} xl={{span:16,offset:4}}>
                  
-                  {/* <RenderDetail res={res}></RenderDetail> */}
+    
+                 {
+                  res&&(
+                    <Card title="文章详情" bordered={false}>
+                       
+                       <div dangerouslySetInnerHTML={{__html: res.content}}></div>
+
+                    </Card>
+                  )
+                } 
 
                 </Col>
 

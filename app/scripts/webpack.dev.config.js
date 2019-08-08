@@ -9,7 +9,7 @@ const OpenBrowserPlugin = require('open-browser-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const AutoDllPlugin = require('autodll-webpack-plugin')
 
-const PORT = 8899
+const PORT = 8898
 const resolve=name=>{
     return path.join(__dirname,name)
 }

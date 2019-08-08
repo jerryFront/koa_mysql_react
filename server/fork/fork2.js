@@ -16,9 +16,9 @@ const Models=require('../model')
 
 
 
-var id=1
-const fork1=fork('http://cntuku.com/huaxu/page/${id}')
-const cb=async $=>{
+
+
+const cb=async ($,id)=>{
     await $('.posts-loop .category-huaxu').each(async function(){
  
          //将其内容一并爬出来存入content内容中
@@ -57,12 +57,17 @@ const cb=async $=>{
  
      })
  
-     fork1(cb,++id)
+    //  fork1(++id)  /**如果有多线程操作，则不需要自动累加 */
  
  }
 
-fork1(cb,id)  
+const fork1=fork('http://cntuku.com/huaxu/page/${id}',cb)
 
+// fork1(1)  
+
+module.exports={
+    fork1,
+}
 
 
 

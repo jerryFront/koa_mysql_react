@@ -77,10 +77,8 @@ function fork(url,callback,id){
        })
        return su
     }
-
-
        
-    return async(callback,id)=>{
+    return async (id)=>{
              let url1=url
             if(id) url1=url1.replace('${id}',id)
             let res=await superAgents(url1)
@@ -89,7 +87,7 @@ function fork(url,callback,id){
                 /**每次重新更新cookie，如果response返回了cookie的话 */
                 headers['Cookie']=(res.headers&&res.headers.Cookie)?res.headers.Cookie:'' 
                 var $=cheerio.load(res.text,{decodeEntities:false}) //所有的dom结构
-                await callback&&callback($)
+                await callback&&callback($,id)
             }else{
                 console.error('拉取数据失败')
                 console.log(`目前拉取:${id}页`) 

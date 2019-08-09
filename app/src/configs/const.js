@@ -2,6 +2,8 @@
 export const set = 'set$'
 export const app_name ='React_news' //slogan
 
+export const page_size=10 //分页数据
+
 
 export const app_token ='app_token'
 

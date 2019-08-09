@@ -2,30 +2,30 @@ import  React,{useRef,useState,useEffect,useContext} from 'react'
 import {Layout,Row,Col,List,Skeleton} from 'antd'
 import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
-import TurnPage from '@components/common/turn_page/index'
+import TurnPage from '@components/common/turn_page'
+import Search from '@components/common/search'
 
 import styles from './index.less'
 
 
 
-
-const useListData=()=>{
-
-
-
-
-
-}
-
-
-
-
 export default ()=>{
   const {Header,Footer,Content}=Layout
+
   let list=[]
+
   const [page_num,setPageNum]=useState(0)
+  const [title,setTitle]=useState('')  //模糊搜索
 
   const [isLoading,res,error,setParams]=http.post('news/list',{page_num,})
+
+  useEffect(()=>{
+     setParams({
+       page_num,
+       title
+     })
+  },[page_num,title])
+
   const RenderList=({res})=>{
 
     if(res&&res.rows&&res.rows.length) list=list.concat(res.rows)
@@ -63,10 +63,19 @@ export default ()=>{
     else return null
     
   }
+
+
+
+
   /**翻页 */
   const turnPage=(num)=>{
-     if(num&&num>0) setPageNum(num)
-     setParams({page_num})
+     if(typeof num==='number'&&num>=0) setPageNum(num)
+  }
+
+  const onSearch=(val)=>{
+    if(val==title) return //相同则不查询 
+    setPageNum(0)
+     setTitle(val)
   }
 
     return (
@@ -74,7 +83,7 @@ export default ()=>{
 
         <Layout>
           <Header>
-            Header
+            <Search placeholder="请输入文章关键字" onSearch={onSearch}></Search>
           </Header>
           <Content>
             

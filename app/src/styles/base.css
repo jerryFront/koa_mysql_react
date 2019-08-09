@@ -30,6 +30,18 @@ html,body{
     height: 100%
 }
 
+:global(.flex){
+    display:flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+:global(.translateY){
+    position: relative;
+    top:50%;
+    transform: translateY(-50%);
+}
+
 :global(#app){
     position:relative;
     min-height:100%;

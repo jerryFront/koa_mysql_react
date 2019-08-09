@@ -79,10 +79,10 @@ function fork(url,callback,id){
     }
        
     return async (id)=>{
-             let url1=url
-            if(id) url1=url1.replace('${id}',id)
+            let url1=url
+            if(id&&typeof id!=='object')  //id存在且id是基本类型才替换 (方便传递复杂类型object做业务处理)
+             url1=url1.replace('${id}',id)
             let res=await superAgents(url1)
-
             if(res&&res.text&&res.status==200){
                 /**每次重新更新cookie，如果response返回了cookie的话 */
                 headers['Cookie']=(res.headers&&res.headers.Cookie)?res.headers.Cookie:'' 

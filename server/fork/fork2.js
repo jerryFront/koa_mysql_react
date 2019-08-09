@@ -16,6 +16,19 @@ const Models=require('../model')
 
 
 
+const cb2=async ($1,uids)=>{
+    let cont=$1('.entry-content')
+    // cont.find('.tg-pc').remove()
+    cont=cont.html()
+
+    await Models.News_detail.create({
+        content:cont,
+        create_time:new Date(),
+        uid:uids.uid,
+    })
+ }
+
+
 
 
 const cb=async ($,id)=>{
@@ -25,7 +38,7 @@ const cb=async ($,id)=>{
          var href=$(this).find('.thumbnail-link').attr('href')
  
          
-         var newsTitle = $(this).find('.entry-title h2 a').text();
+         var newsTitle = $(this).find('.entry-title a').text();
          var content = $(this).find('.entry-summary').text();
          var newsTime=$(this).find('.entry-date').text();
          var newsImg= $(this).find('.thumbnail-wrap img').attr('src');
@@ -40,19 +53,7 @@ const cb=async ($,id)=>{
          })
 
          if(news){
-             
-             fork(href)(async $1=>{
-                let cont=$1('.entry-content')
-                // cont.find('.tg-pc').remove()
-                cont=cont.html()
- 
-                await Models.News_detail.create({
-                    content:cont,
-                    create_time:new Date(),
-                    uid,
-                })
-             }) 
- 
+            await fork(href,cb2)({uid}) 
          }
  
      })
@@ -63,7 +64,7 @@ const cb=async ($,id)=>{
 
 const fork1=fork('http://cntuku.com/huaxu/page/${id}',cb)
 
-// fork1(1)  
+fork1(1)  
 
 module.exports={
     fork1,

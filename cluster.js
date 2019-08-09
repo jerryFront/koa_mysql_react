@@ -3,7 +3,7 @@
  */
 
  const cluster=require('cluster')
- const numCPUs=require('os').cpus().length
+ const numCPUs=require('os').length
 
  //记录所有的从进程,便于分发
  const workers=[]
@@ -17,6 +17,14 @@ const updateQueue=(item)=>{
    else task_queue.push(item)
 }
 
+(function(){
+
+       /**动态更新异步队列 */
+       var arr=[]
+       for(var i=1;i<=5000;i++) arr.push(i)
+       updateQueue(arr)
+
+})()
 
  //将队列按照规则分发给对应worker，平均分发
  const dispatch=()=>{
@@ -24,7 +32,6 @@ const updateQueue=(item)=>{
 
    for(let k=0,l=task_queue.length;k<l;k++){
       if(workers[k%numCPUs]) workers[k%numCPUs].send(task_queue[k])
-
    }
   
 
@@ -53,12 +60,6 @@ const updateQueue=(item)=>{
 
     var results=[]
 
-    /**动态更新异步队列 */
-    var arr=[]
-    for(var i=1;i<2000;i++) arr.push(i)
-    updateQueue(arr)
-
- 
     for (var i = 0; i < numCPUs; i++) {
          let wk=cluster.fork();
 

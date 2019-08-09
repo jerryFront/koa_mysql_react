@@ -31,8 +31,12 @@ const updateQueue=(item)=>{
    /**暂时按照平均分派的原则  通过send方法将参数传递*/
 
    for(let k=0,l=task_queue.length;k<l;k++){
-      if(workers[k%numCPUs]) workers[k%numCPUs].send(task_queue[k])
+      setTimeout(()=>{  //尝试延时来降低并发频率
+         if(workers[k%numCPUs]) workers[k%numCPUs].send(task_queue[k])
+      },1)
    }
+
+
   
 
    

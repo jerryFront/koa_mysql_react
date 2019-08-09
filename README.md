@@ -56,3 +56,14 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 1.lazy/react-loadable/@loadable/component 利用webpack新特性实现懒加载
 2.特别注意动态import(webpack语法)的实际执行(path只能中间部分动态变化，利用include来减少全局搜索的文件类型)
 
+
+2019.8.8
+
+1.cluster线程池 分发send 参数，然后从线程 process.on('message')接收参数执行，执行完后process.send(result)，然后线程池对应的每个worker的on('message')接收处理完的result
+
+
+2019.8.9
+
+1.reacthooks function components要注意将逻辑与return(render)分开，否则rerender会不断执行初始化数据 
+2.css module的样式问题，父组件:local会自动作用于子组件
+

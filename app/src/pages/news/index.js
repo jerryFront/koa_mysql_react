@@ -2,29 +2,30 @@ import  React,{useRef,useState,useEffect,useContext} from 'react'
 import {Layout,Row,Col,List,Skeleton} from 'antd'
 import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
-
-
+import TurnPage from '@components/common/turn_page/index'
 
 import styles from './index.less'
 
+
+
+
+const useListData=()=>{
+
+
+
+
+
+}
+
+
+
+
 export default ()=>{
-   
-  const initData={
-    page_num:0,
-  }
-  let list=[]
-
-
-
-  const [isLoading,res,error,setParams]=http.post('news/list',initData)
-  
-  
-
   const {Header,Footer,Content}=Layout
+  let list=[]
+  const [page_num,setPageNum]=useState(0)
 
-
-
-
+  const [isLoading,res,error,setParams]=http.post('news/list',{page_num,})
   const RenderList=({res})=>{
 
     if(res&&res.rows&&res.rows.length) list=list.concat(res.rows)
@@ -62,6 +63,11 @@ export default ()=>{
     else return null
     
   }
+  /**翻页 */
+  const turnPage=(num)=>{
+     if(num&&num>0) setPageNum(num)
+     setParams({page_num})
+  }
 
     return (
         <section className={styles.container}>
@@ -74,8 +80,16 @@ export default ()=>{
             
               <Row>
                 <Col lg={24} xl={{span:16,offset:4}}>
-                 
-                  <RenderList res={res}></RenderList>
+
+                 {
+                  res&&res.count&&(
+                    <div>             
+                    <RenderList res={res}></RenderList>
+                    <TurnPage count={res.count} page_num={page_num} turn={turnPage}></TurnPage>
+                    </div> 
+                  )
+                 } 
+
 
                 </Col>
 

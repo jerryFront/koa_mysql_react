@@ -4,13 +4,16 @@ import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
 import TurnPage from '@components/common/turn_page'
 import Search from '@components/common/search'
+import Header from '@components/common/header'
 
 import styles from './index.less'
 
 
 
+
 export default ()=>{
-  const {Header,Footer,Content}=Layout
+
+  const {Footer,Content}=Layout
 
   let list=[]
 

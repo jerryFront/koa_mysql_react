@@ -67,3 +67,7 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 1.reacthooks function components要注意将逻辑与return(render)分开，否则rerender会不断执行初始化数据 
 2.css module的样式问题，父组件:local会自动作用于子组件
 
+2019.8.10
+
+1.props.children卡槽，类比props render同理
+

@@ -13,7 +13,7 @@ import Loadable from 'react-loadable' //懒加载
 import styles from './index.less'
 import {Spin} from 'antd'
 import {isLogin} from './common'
-import {commonReducer} from '@reducers/common'
+
 
 
 /**动态加载组件
@@ -41,44 +41,12 @@ const AsyncPage=path=>{
 
 
 
-export const commonContext=React.createContext(null)
-
-
-/**
- * 不同的总路由页面采用不同的reducer数据
- * 然后fetch去对应的dispatch
- **/
-const comReducer=()=>{
-    const [commonState,dispatch]=useReducer(commonReducer,{
-        isFetching:false,
-        isLoading:false,
-    })
-
-    return [commonState,dispatch]
-}
-
-
 /**
  *最外层加loading会引起层层重复渲染 
  * {commonState.isLoading&&<Loader />}  
  *  */
 
-//主要的路由表结构
-const PrimaryLayout=()=>{
 
-    const [commonState,dispatch]=comReducer()
-
-    return(
-     
-    <commonContext.Provider value={{commonState,dispatch}}>
-    <section className={styles.container}>
-          {AsyncPage('news/index')}
-    </section>
-    </commonContext.Provider>    
-    )
-}
-
- 
 
 export function App(){
    
@@ -91,10 +59,11 @@ export function App(){
        <HashRouter>
           <Switch>
               <Route path="/" exact render={()=>(
-                 !isLogin()?(<PrimaryLayout />):(<Redirect to="/login" />)
+                 !isLogin()?(<Redirect to="/index" />):(<Redirect to="/login" />)
               )}></Route> 
   
 
+              <Route path="/index" component={AsyncPage('base/primary')}></Route>
               <Route path="/login"  component={AsyncPage('login/index')}></Route>
               <Route path="/news" exact component={AsyncPage('news/index')}></Route>
               <Route path="/news/detail/:uid" component={AsyncPage('news/detail')}></Route>

@@ -13,7 +13,7 @@ export default (props)=>{
 
 
   return(
-      <section className={`${styles.container} translateY`}>
+      <section className={`${styles.container}`}>
          <Search placeholder={placeholder} onSearch={value=>onSearch(value)} style={{width}} enterButton></Search>
       </section>
   )

@@ -11,8 +11,6 @@ import {setStorge,getStorage,removeStorage} from '@utils/storage'
 
     if(!getStorage('user_info')) return false
     
-    return true
-
-  
+    return JSON.parse(getStorage('user_info'))
 
  }

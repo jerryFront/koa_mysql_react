@@ -1,5 +1,5 @@
 import React,{setState} from 'react'
-
+import { Link } from 'react-router-dom'
 import {Layout} from 'antd'
 import {isLogin} from '@pages/base/common'
 
@@ -22,9 +22,9 @@ export default props=>{
 
      {user_info?(
        <section className={styles.user}>user_info.name</section>
-       ):(<section className={styles.user}>
+       ):(<Link to="/login" className={styles.user} >
       登录
-     </section>)}
+     </Link>)}
 
    </Header>)
 

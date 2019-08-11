@@ -55,6 +55,7 @@ html,body{
     height:100%;
     z-index:20;
     background:rgba(50,50,50,0.4);
+    display:none;
 }
 
 a {color:#888;}

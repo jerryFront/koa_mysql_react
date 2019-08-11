@@ -76,14 +76,14 @@ export function App(){
     )
 }
 
-export function Loader(){
+export function Loader({error,pastDelay}){
 
-    return (
-        <Spin tip="Loading..."  size="large">
-        <div className={styles.container}>
-        </div>
-        </Spin>
-    )
+    if(error) return <div>error</div>
+    else if(pastDelay) return (<Spin tip="Loading..."  size="large">
+    <div className={styles.container}>
+    </div>
+    </Spin>)
+    else return null   
 
 }
 

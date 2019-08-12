@@ -2,18 +2,18 @@
  * 设置缓存相关
  */
 
-import { storge_prefix } from '@configs/const'
+import { storage_prefix } from '@configs/const'
 
 // 函数式调用
 const commonStorage ={
     get(){
-        return key=>localStorage.getItem(storge_prefix+key)?JSON.parse(localStorage.getItem(storge_prefix+key)):null
+        return key=>localStorage.getItem(storage_prefix+key)?JSON.parse(localStorage.getItem(storage_prefix+key)):null
     },
     set(){
         return key=>val=>localStorage.setItem(storage_prefix+key,val?JSON.stringify(val):null)
     },
     remove(){
-        return key=>localStorage.remove(storge_prefix)
+        return key=>localStorage.remove(storage_prefix)
     }
 } 
 

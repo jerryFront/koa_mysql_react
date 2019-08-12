@@ -10,7 +10,10 @@ const User=defineModel('Users',{
         type:seq.STRING(50),
         allowNull:true,
     },    
-    password:seq.STRING(50), //密文
+    password:{
+        type:seq.STRING(50), //密文
+        allowNull:false,
+    },    
     mobile:{
         type:seq.STRING(11),
         unique:'uq_t_user'

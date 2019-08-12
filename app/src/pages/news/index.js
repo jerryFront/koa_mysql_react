@@ -18,6 +18,7 @@ export default ()=>{
   let list=[]
 
   const [page_num,setPageNum]=useState(0)
+
   const [title,setTitle]=useState('')  //模糊搜索
 
   const [isLoading,res,error,setParams]=http.post('news/list',{page_num,})

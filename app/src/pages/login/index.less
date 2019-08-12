@@ -1,10 +1,25 @@
+@import '../../styles/var.less';
+
 .container{
     position:absolute;
-    width:400px;
+    width:500px;
+    height:300px;
     left:50%;
     top:50%;
     transform:translateX(-50%) translateY(-50%); 
-    // display:flex;
-    // flex-wrap: wrap;
+    background:@bgColor1;
+}
 
+.box{
+    position:relative;
+    margin:0 auto;
+    width:400px;
+    top:50%;
+    transform: translateY(-50%);
+}
+
+.loginButton{
+    position:relative;
+    left:50%;
+    transform: translateX(-50%);
 }

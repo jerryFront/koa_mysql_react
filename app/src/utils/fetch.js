@@ -111,6 +111,8 @@ export default class http{
 
     const isPost=baseConfig.method==='post'?true:false
 
+    
+
 
     //暂时用dom去创建loading加载
 
@@ -131,9 +133,14 @@ export default class http{
 
     const fetch=useCallback(async ()=>{
 
-      if(!beforeHttp(url,data)) return
 
-      const userheader=getStorage('user_info')||{token:''}
+      /**
+       * 如果没有带任何参数即undefined时候，不请求数据
+       * 因为hooks只能在主function中执行，所以必须init时执行一次(实际不发起请求)
+       *  */
+      if(!data||!beforeHttp(url,data)) return
+ 
+      const userheader={token:getStorage('user_info')?getStorage('user_info').token:''}
       baseConfig.headers={...baseConfig.headers,...this.createHeader(),...userheader}
       baseConfig.url=`${rootPath}${url}`
       if(isPost) baseConfig.data=qs.stringify(data)
@@ -144,7 +151,6 @@ export default class http{
 
       try{
 
- 
         let res=await axios(baseConfig).then(res=>res.data)
 
         setIsLoading(false)
@@ -172,7 +178,8 @@ export default class http{
         if(res.code&&res.code!==200){
           message.error(res.msg,6)
           return
-        } 
+        }
+        
         setRes(res.data)
 
       }catch(e){

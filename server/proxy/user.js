@@ -17,7 +17,8 @@ const signIn=async (req,next)=>{
    }
 
    query.attributes={exclude:['password']}
-    
+
+
    let re=await User.find(query)
 
    if(re.length>0){ //登录成功，则写入token
@@ -33,9 +34,14 @@ const signIn=async (req,next)=>{
 
       re['token']=key
 
+      rep.reply(req,re)
+
+   }else{ //登录失败
+
+      rep.reply(req,re,'1101') 
    }
 
-   rep.reply(req,re)
+
   
 
    

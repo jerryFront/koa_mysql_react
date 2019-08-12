@@ -10,9 +10,22 @@
          return
      }
 
+     let query=null
+
      if(ctx.request.query&&Object.getOwnPropertyNames(ctx.request.query).length) 
-     return ctx.request.query
-     else return ctx.request.body
+     query=ctx.request.query
+     else query=ctx.request.body
+
+     /**默认处理好where */
+
+     if(typeof query!=='object'||!Object.keys(query).length) return query
+
+     query.where=Object.keys(query).reduce((prev,cur)=>{
+         if(typeof query[cur]!=='undefined') prev[cur]=query[cur]
+         return prev
+     },{})
+
+    return query
 
  }
  
@@ -24,11 +37,14 @@
      }
  }
 
- //统一正确或错误返回
- const reply=(req,re)=>{
-
-    if(re) req.response.body=response(re,'0200')
-    else req.response.body=response(re,'0601')
+ /**
+  * 统一正确或错误返回
+  * 优先匹配业务逻辑相关的错误码
+  */
+ const reply=(req,data,code)=>{
+    if(code) req.response.body=response(data,code)  
+    else if((typeof data==='object'&&Object.keys(data).length)||(Array.isArray(data))) req.response.body=response(data,'0200')
+    else req.response.body=response(data,'0601')
     
  }
 

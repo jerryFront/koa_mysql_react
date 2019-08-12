@@ -71,3 +71,7 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 
 1.props.children卡槽，类比props render同理
 
+2019.8.12
+
+1.react-css-modules为css module的备选方案
+

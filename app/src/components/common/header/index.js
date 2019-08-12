@@ -21,7 +21,7 @@ export default props=>{
      {props.children}
 
      {user_info?(
-       <section className={styles.user}>user_info.name</section>
+       <section className={styles.user}>{user_info.name}</section>
        ):(<Link to="/login" className={styles.user} >
       登录
      </Link>)}

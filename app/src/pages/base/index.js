@@ -62,8 +62,8 @@ export function App(){
                  !isLogin()?(<Redirect to="/index" />):(<Redirect to="/login" />)
               )}></Route> 
   
-
               <Route path="/index" component={AsyncPage('base/primary')}></Route>
+              <Route path="/set" exact component={AsyncPage('login/set')}></Route>
               <Route path="/login"  component={AsyncPage('login/index')}></Route>
               <Route path="/news" exact component={AsyncPage('news/index')}></Route>
               <Route path="/news/detail/:uid" component={AsyncPage('news/detail')}></Route>

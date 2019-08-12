@@ -18,6 +18,7 @@ const User=defineModel('Users',{
         type:seq.STRING(11),
         unique:'uq_t_user'
     },
+    email:seq.STRING(30),
     sex:{
         type:seq.INTEGER(1),
         defaultValue:0,

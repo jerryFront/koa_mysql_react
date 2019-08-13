@@ -30,23 +30,23 @@ const beforeUpload=file=>{
 
 export default (props)=>{
 
-    const [isLoading,res,error,setParams]=http.get('user/info',user_id?{id:user_id}:null)
-
     const [loading,setLoading]=useState(false)
     const [imageUrl,setImageUrl]=useState(res?res.headImg:null)
 
+    const [isLoading,res]=http.get('user/info',user_id?{id:user_id}:null)
+
+    const [isLoad,res1,error,setParams]=http.post('upload/image',null)
+
+
+
+
     const handleChange=info=>{
-        console.log(info)
-       if(info.status==='uploading'){
+           if(!info||!info.file) return
            setLoading(true)
-           return
-       }
-       if(info.status==='done'){
            getBase64(info.file.originFileObj,imageUrl=>{
-               setImageUrl(imageUrl)
-               setLoading(false)
+              setParams({image:imageUrl})
+              setImageUrl(imageUrl)
            })
-       }
 
     }
 
@@ -56,7 +56,6 @@ export default (props)=>{
         listType="picture-card"
         className="avatar-uploader"
         showUploadList={false}
-        action="http://localhost:4000/upload/image"
         beforeUpload={beforeUpload}
         onChange={handleChange}>
 

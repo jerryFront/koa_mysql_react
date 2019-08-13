@@ -98,10 +98,9 @@ export default class http{
     
     const [url]=args 
 
+
     //需要监听data变化的时候，必须设置其为hook相关
     const [data,setData]=useState(args[1])
-
-    console.log(data) 
 
     // const data=useRef(args[1])
 
@@ -143,8 +142,15 @@ export default class http{
       const userheader={token:getStorage('user_info')?getStorage('user_info').token:''}
       baseConfig.headers={...baseConfig.headers,...this.createHeader(),...userheader}
       baseConfig.url=`${rootPath}${url}`
-      if(isPost) baseConfig.data=qs.stringify(data)
-      else baseConfig.params=data
+      if(isPost){  //因为post和get是分两个不同的字段传递参数的，必须清除不必要的上次参数污染
+        baseConfig.data=qs.stringify(data)
+        baseConfig.params=null
+      }
+      else{
+        baseConfig.params=data
+        baseConfig.data=null
+      }
+
 
       if(isLoading) return
       setIsLoading(true)

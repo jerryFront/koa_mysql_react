@@ -41,8 +41,8 @@
   * 统一正确或错误返回
   * 优先匹配业务逻辑相关的错误码
   */
- const reply=(req,data,code)=>{
-    if(code) req.response.body=response(data,code)  
+ const reply=(req,data,code,msg)=>{
+    if(code) req.response.body=response(data,code,msg)  
     else if((typeof data==='object'&&Object.keys(data).length)||(Array.isArray(data))) req.response.body=response(data,'0200')
     else req.response.body=response(data,'0601')
     

@@ -1,10 +1,8 @@
 import axios from 'axios'
 import React,{useState,useEffect,useCallback} from 'react'
-import ReactDOM from 'react-dom'
 import {message} from 'antd'
 import {timeout,rootPath} from '@configs/const'
 import {getStorage,removeStorage} from '@utils/storage'
-import {Loader} from '@pages/base/index'
 
 
 const md5=require('md5')
@@ -56,7 +54,7 @@ const baseConfig={
 
 export default class http{
 
-  ReactDOM
+
 
 
   static guid(){
@@ -170,8 +168,10 @@ export default class http{
           message.error('请求包含的鉴权信息不合法，请重试',6)
           return
         } 
-        if(res.code&&res.code===802){
-          message.error('Token令牌已过期，请重新登录',6)
+        if(res.code&&res.code===802){ //跳转登录
+          message.error('Token令牌已过期，请重新登录',4)
+          window.location.href="#/login"
+          removeStorage('user_info')
           return
         }
 

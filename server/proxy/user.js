@@ -40,13 +40,29 @@ const signIn=async (req,next)=>{
 
       rep.reply(req,re,'1101') 
    }
-
-
-  
-
    
 }
 
+
+const getUser=async (req,next)=>{
+
+   let query=rep.request(req)
+   const res=User.validate(query,'user_id')
+   if(!res||!res.result){
+      req.response.body=rep.response(null,'0601',res.msg)
+      return
+   }
+   query.attributes={exclude:['password']}
+
+   let re=await User.find(query.user_id)
+
+   rep.reply(req,re)
+    
+
+}
+
+
 module.exports={
    signIn,
+   getUser,
 }

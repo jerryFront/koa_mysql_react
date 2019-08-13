@@ -13,7 +13,7 @@ const commonStorage ={
         return key=>val=>localStorage.setItem(storage_prefix+key,val?JSON.stringify(val):null)
     },
     remove(){
-        return key=>localStorage.remove(storage_prefix)
+        return key=>localStorage.removeItem(storage_prefix+key)
     }
 } 
 

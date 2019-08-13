@@ -40,6 +40,17 @@ const AsyncPage=path=>{
 }
 
 
+/**模拟处理onEnter */
+const Route4=(props)=>{
+    const isPromise=(props.onEnter!==undefined&&props.onEnter().then!==undefined)?true:false
+    const render=res=>res?(<Route {...props}></Route>):(<Redirect to="/login"></Redirect>)
+    return (
+        props.onEnter!==undefined?(
+            isPromise?props.onEnter().then(re=>render(res)):render()
+        ):<Route {...props}></Route>
+    )
+}
+
 
 /**
  *最外层加loading会引起层层重复渲染 
@@ -54,19 +65,16 @@ export function App(){
      * exact 指定确定的路由
      * v4 没有onEnter onLeave onUpdate 对应修改要到Route的生命周期对应
      */
-   
+
     return (
        <HashRouter>
           <Switch>
-              <Route path="/" exact render={()=>(
-                 !isLogin()?(<Redirect to="/index" />):(<Redirect to="/login" />)
-              )}></Route> 
-  
-              <Route path="/index" component={AsyncPage('base/primary')}></Route>
-              <Route path="/set" exact component={AsyncPage('login/set')}></Route>
-              <Route path="/login"  component={AsyncPage('login/index')}></Route>
-              <Route path="/news" exact component={AsyncPage('news/index')}></Route>
-              <Route path="/news/detail/:uid" component={AsyncPage('news/detail')}></Route>
+              <Route4 path="/" exact component={AsyncPage('news/index')}></Route4> 
+              <Route4 path="/index"  component={AsyncPage('base/primary')}></Route4>
+              <Route4 path="/set" exact  onEnter={isLogin} component={AsyncPage('login/set')}></Route4>
+              <Route4 path="/login"  component={AsyncPage('login/index')}></Route4>
+              <Route4 path="/news" exact component={AsyncPage('news/index')}></Route4>
+              <Route4 path="/news/detail/:uid" component={AsyncPage('news/detail')}></Route4>
               
             
              

@@ -15,7 +15,7 @@ export default (props)=>{
     const [username,setUsername]=useState('')
     const [password,setPassword]=useState('')
 
-    const [isLoading,res,error,setParams]=http.post('user/login',)
+    const [isLoading,res,error,setParams]=http.post('user/login',null)
 
 
     useLayoutEffect(()=>{

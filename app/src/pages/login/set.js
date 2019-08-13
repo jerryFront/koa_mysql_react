@@ -36,7 +36,7 @@ export default (props)=>{
     const [imageUrl,setImageUrl]=useState(res?res.headImg:null)
 
     const handleChange=info=>{
-
+        console.log(info)
        if(info.status==='uploading'){
            setLoading(true)
            return
@@ -56,7 +56,7 @@ export default (props)=>{
         listType="picture-card"
         className="avatar-uploader"
         showUploadList={false}
-        action="/upload/image"
+        action="http://localhost:4000/upload/image"
         beforeUpload={beforeUpload}
         onChange={handleChange}>
 

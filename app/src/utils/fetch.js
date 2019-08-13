@@ -101,6 +101,8 @@ export default class http{
     //需要监听data变化的时候，必须设置其为hook相关
     const [data,setData]=useState(args[1])
 
+    console.log(data) 
+
     // const data=useRef(args[1])
 
     const [isLoading,setIsLoading]=useState(false)

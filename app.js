@@ -21,17 +21,17 @@
 
  //加载静态资源
  app.use(koaStatic(
-     path.join(__dirname,'./server/public')
+     path.join(__dirname,'./server/public'),
+     path.join(__dirname,'./app'),
+     path.join(__dirname,'./server/assets'),
  ))
 
- app.use(koaStatic(
-    path.join(__dirname,'./app')
-))
+
 
 
 //表单解析大小限制
 app.use(bodyParser({
-    "formLimit":'5mb',
+    "formLimit":'2mb', //上传限制2M
     "jsonLimit":'5mb',
     "textLimit":'5mb'
 }))
@@ -107,8 +107,8 @@ app.use(all)
 
 //路由相关
 app.use(require('./server/router/user').routes())
-
 app.use(require('./server/router/news').routes())
+app.use(require('./server/router/common').routes())
 
 
 

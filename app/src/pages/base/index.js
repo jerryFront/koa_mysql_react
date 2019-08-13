@@ -46,7 +46,7 @@ const Route4=(props)=>{
     const render=res=>res?(<Route {...props}></Route>):(<Redirect to="/login"></Redirect>)
     return (
         props.onEnter!==undefined?(
-            isPromise?props.onEnter().then(re=>render(res)):render()
+            isPromise?props.onEnter().then(re=>render(res)):render(props.onEnter())
         ):<Route {...props}></Route>
     )
 }

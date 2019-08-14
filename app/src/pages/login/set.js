@@ -53,7 +53,11 @@ export default (props)=>{
     },[res1])
 
     useLayoutEffect(()=>{
-        if(res2) message.success('数据更新成功')  
+        if(res2){
+            message.success('数据更新成功')
+            /**更新之后同时也更新缓存 */
+            setStorage('user_info')(ref.current)
+        }  
     },[res2])
 
     const handleChange=info=>{

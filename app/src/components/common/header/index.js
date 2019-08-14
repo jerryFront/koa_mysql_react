@@ -35,7 +35,7 @@ export default props=>{
 
      {user_info?(
         <Dropdown overlay={menu} placement="bottomCenter">
-          <section className={styles.user}>{user_info.name}</section>
+          <section className={`${styles.user} ellipsis`}>{user_info.name}</section>
         </Dropdown>
        ):(<Link to="/login" className={styles.user} >
       登录

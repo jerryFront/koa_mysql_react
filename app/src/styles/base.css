@@ -36,6 +36,19 @@ html,body{
     justify-content: flex-start;
 }
 
+:global(.flex-center){
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:global(.ellipsis){
+    overflow: hidden;
+    word-wrap: normal;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 :global(.translateY){
     position: relative;
     top:50%;

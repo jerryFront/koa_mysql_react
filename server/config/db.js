@@ -169,16 +169,10 @@ function defineModel(name,attributes){
 
 
     }
+    
+    /**更新redis,在update和create的时候都需要处理 */
+    const updateRedis=(res,ex)=>{
 
-
-    //创建时，可以多传入自定义过期时间
-    Model.created=async (params,ex)=>{
-        if(typeof params!=='object'){
-            console.error('Create query must be Object')
-            return
-        }
-        //寻找主键，primaryKey:true或第一个unique存在的列
-        let res=await Model.create(params)
         if(res){
             //更新对应缓存
             let _key=null,_val=null
@@ -196,9 +190,38 @@ function defineModel(name,attributes){
             _key=`${Model}:${_key}`
             ex?redis.mqSet(_key,_val,ex):redis.mqSet(_key,_val)       
         }
+        
+    }
+
+
+    //创建时，可以多传入自定义过期时间
+    Model.created=async (params,ex)=>{
+        if(typeof params!=='object'){
+            console.error('Create query must be Object')
+            return
+        }
+        //寻找主键，primaryKey:true或第一个unique存在的列
+        let res=await Model.create(params)
+        
+        updateRedis(res,ex)
 
         return res 
 
+    }
+
+    //update，更新redis
+    Model.updated=async (params,ex)=>{
+        if(typeof params!=='object'||params.where===undefined){
+            console.error('Update query must be Object or query.where is undefined')
+            return
+        }
+        //寻找主键，primaryKey:true或第一个unique存在的列
+        /**update两个参数 一个params，一个where语句 */
+        let res=await Model.update(params,params)
+        
+        updateRedis(res,ex)
+
+        return res 
     }
 
 

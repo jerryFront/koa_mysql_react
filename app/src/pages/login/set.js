@@ -1,9 +1,11 @@
-import React,{useState,useLayoutEffect,useCallback} from 'react'
-import {Upload,Icon,message} from 'antd'
+import React,{useState,useLayoutEffect,useCallback,useRef} from 'react'
+import {Upload,Icon,message,Layout,Divider,Col,Input,Card,Radio,Button} from 'antd'
 import http from '@utils/fetch'
 import {setStorage,getStorage} from '@utils/storage'
+import {rootPath} from '@configs/const'
 
 import styles from './index.less'
+import { changeConfirmLocale } from 'antd/lib/modal/locale';
 
 
 const user_id=getStorage('user_info')?getStorage('user_info').id:null
@@ -28,45 +30,126 @@ const beforeUpload=file=>{
     return true
 }
 
+const {Content}=Layout
+
 export default (props)=>{
 
     const [loading,setLoading]=useState(false)
-    const [imageUrl,setImageUrl]=useState(res?res.headImg:null)
 
     const [isLoading,res]=http.get('user/info',user_id?{id:user_id}:null)
 
     const [isLoad,res1,error,setParams]=http.post('upload/image',null)
 
+    const [isLoading2,res2,error2,setParams2]=http.post('user/update',null)
 
 
+
+    //用来记录最新数据，不一定是更新成功的，因为update返回的只有成功，避免再请求一遍get，采用ref记录每次最新的res
+    const ref=useRef(null) 
+
+
+    useLayoutEffect(()=>{
+        if(res1&&res1.url) res.headImg=res1.url.replace(`${rootPath}`,"")   
+        setLoading(false)
+    },[res1])
+
+    useLayoutEffect(()=>{
+        if(res2) message.success('数据更新成功')  
+    },[res2])
 
     const handleChange=info=>{
            if(!info||!info.file) return
+           if(!beforeUpload(info.file)) return
+
            setLoading(true)
            getBase64(info.file.originFileObj,imageUrl=>{
-              setParams({image:imageUrl})
-              setImageUrl(imageUrl)
+              setParams({image:imageUrl}) //触发上传
            })
 
     }
 
+    const inputChange=(e,type)=>{
+       if(!type) return
+       res[type]=e.target.value
+    }
+
+
+
+    const update=()=>{
+        if(res){ //每次render之后，res值为空，则默认理解为没有更改就不用提交请求，有更改再提交
+            ref.current=res
+            setParams2(res)
+        }
+    }
+
 
     return (
-        <Upload name="avatar"
-        listType="picture-card"
-        className="avatar-uploader"
-        showUploadList={false}
-        beforeUpload={beforeUpload}
-        onChange={handleChange}>
+        <section className={styles.mcontainer}>
 
-        {imageUrl?<img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> :(
-            <div>
-                <Icon type={loading?'loading':'plus'}></Icon>
-                <div className="ant-upload-text">Upload</div>
-            </div>
-        )}
+        <Layout>
 
-        </Upload>
+          <Content>
+
+            <Col lg={24} xl={{span:16,offset:4}}>
+
+              {
+               res&&(
+                   <Card title="个人信息" bordered={false}>
+                       
+                       <Divider orientation="left">用户名</Divider>
+                       <nav>{res.username}</nav>
+
+                       <Divider orientation="left">昵称</Divider>
+                       <nav><Input type="text" maxLength={12} onChange={e=>inputChange(e,'name')} defaultValue={res.name}></Input></nav>
+
+                       <Divider orientation="left">手机号</Divider>
+                       <nav><Input type="text" maxLength={11} onChange={e=>inputChange(e,'mobile')}  defaultValue={res.mobile}></Input></nav>
+
+                       <Divider orientation="left">邮箱</Divider>
+                       <nav><Input type="text" maxLength={20} onChange={e=>inputChange(e,'email')} defaultValue={res.email}></Input></nav>
+
+                       <Divider orientation="left">性别</Divider>
+                       <nav>
+                           <Radio.Group defaultValue={res.sex} buttonStyle="solid" onChange={e=>inputChange(e,'sex')}>
+                                <Radio.Button value={0}>男生</Radio.Button>
+                                <Radio.Button value={1}>女生</Radio.Button>
+                           </Radio.Group>
+                       </nav>
+                    
+                       <Divider orientation="left">头像</Divider>
+                       <nav>
+                       <Upload name="avatar"
+                        listType="picture-card"
+                        className="avatar-uploader"
+                        showUploadList={false}
+                        onChange={handleChange}>
+                        {res.headImg?<img src={`${rootPath}${res.headImg}`} alt="avatar" style={{ width: '100%' }} /> :(
+                            <label>
+                                <Icon type={loading?'loading':'plus'}></Icon>
+                                <label className="ant-upload-text">上传</label>
+                            </label>
+                        )}
+                        </Upload>
+                       </nav>
+
+                       <nav className="flex-center">
+                       <Button type="primary" loading={isLoading2} onClick={()=>update()}>提交修改</Button>
+                       </nav>
+                       
+
+                    </Card>
+               )
+
+              }
+
+            </Col>
+
+          </Content>
+
+        </Layout>
+
+        </section>
+
     )
 
 

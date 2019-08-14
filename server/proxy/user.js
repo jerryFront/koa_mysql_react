@@ -63,8 +63,29 @@ const getUser=async (req,next)=>{
 
 }
 
+const update=async (req,next)=>{
+
+     let query=rep.request(req)
+     const res=User.validate(query,'id')
+     if(!res||!res.result){
+      req.response.body=rep.response(null,'0601',res.msg)
+      return
+     }
+
+     query.attributes={exclude:['password']}
+
+     query.where={id:query.id}
+
+     let re=await User.updated(query)
+
+     rep.reply(req,re)
+
+
+}
+
 
 module.exports={
    signIn,
    getUser,
+   update,
 }

@@ -24,7 +24,9 @@ const fileUpload=async (req,next)=>{
             ext=key //用来记录存储文件后缀名
             return ""
         })
-        const dataBuffer=new Buffer(base64Data,'base64')
+
+        /**10.0以上Buffer  deprecated 改new Buffer为Buffer.from */
+        const dataBuffer=Buffer.from(base64Data,'base64')
         
         if(ext) ext='.'+ext
        
@@ -32,14 +34,14 @@ const fileUpload=async (req,next)=>{
         const newFileName=new Date().getTime()+'_'+randomName(8)+ext
         const now=new Date()
         const date=`${now.getFullYear()}${now.getMonth()>9?now.getMonth():'0'+now.getMonth()}${now.getDate()}`
-
-        const targetPath=path.join(__dirname,`../assets/${date}`)
+        const tempPath=`../assets/${date}`
+        const targetPath=path.join(__dirname,tempPath)
 
         /**
          * 先检查目录是否存在 isDirectory
          * 不存在则创建目录,直接写文件存在权限问题
          *  */
-        await checkDirExists(targetPath)
+        await checkDirExists(tempPath)
         
         //写入文件
         const res=await writeFile(`${targetPath}/${newFileName}`,dataBuffer)

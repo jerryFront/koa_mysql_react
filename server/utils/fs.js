@@ -48,12 +48,13 @@ const mkdir=(dir,type)=>{
 const checkDirExists=dir=>{
 
     const paths=dir.split('/')
-    let _path=''
-    for(let i=1;i<paths.length;i++){ //根目录需要过滤掉，下标从1开始
+    let _path='',_dirPath
+    for(let i=0;i<paths.length;i++){ //根目录需要过滤掉，下标从1开始
         if(paths[i]){
             _path+=`/${paths[i]}`
-            if(!fs.existsSync(_path)){
-                mkdir(_path)
+            _dirPath=path.join(__dirname,_path)
+            if(!fs.existsSync(_dirPath)){
+                mkdir(_dirPath)
             }
         }
     }

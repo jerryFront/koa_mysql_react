@@ -43,7 +43,6 @@ export default (props)=>{
     const [isLoading2,res2,error2,setParams2]=http.post('user/update',null)
 
 
-
     //用来记录最新数据，不一定是更新成功的，因为update返回的只有成功，避免再请求一遍get，采用ref记录每次最新的res
     const ref=useRef(null) 
 
@@ -59,7 +58,7 @@ export default (props)=>{
 
     const handleChange=info=>{
            if(!info||!info.file) return
-           if(!beforeUpload(info.file)) return
+           if(!beforeUpload(info.file)||loading) return //避免多次重复请求
 
            setLoading(true)
            getBase64(info.file.originFileObj,imageUrl=>{
@@ -76,9 +75,13 @@ export default (props)=>{
 
 
     const update=()=>{
-        if(res){ //每次render之后，res值为空，则默认理解为没有更改就不用提交请求，有更改再提交
+      /**
+       *每次render之后，如果res值为空(但实际每次都会有数据)，则默认理解为没有更改就不用提交请求，有更改再提交
+       *实际有数据是每次res都会从链表的尾部读取数据作为其最新数据
+       *    */
+        if(res){ 
             ref.current=res
-            setParams2(res)
+            setParams2({...ref.current})  //注意useState传入的值需要每次浅拷贝，不然一直是对应的变量的引用，不会认为其有变化
         }
     }
 

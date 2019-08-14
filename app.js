@@ -19,13 +19,17 @@
 
 
 
- //加载静态资源
+ /**
+  *加载静态资源
+  * 必须每个单独配置，读取不同每个文件夹下对应的静态资源
+  * */
  app.use(koaStatic(
-     path.join(__dirname,'./server/public'),
      path.join(__dirname,'./app'),
-     path.join(__dirname,'./server/assets'),
  ))
 
+ app.use(koaStatic(
+    path.join(__dirname,'./server/assets'),
+ ))
 
 
 

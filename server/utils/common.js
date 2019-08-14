@@ -27,6 +27,19 @@ const guid=()=>{
  return uuid.join("");
 }
 
+/**随机生成n位文件名 */
+const randomName=(n)=>{
+   
+   let res=""
+   for(let i=0;i<n;i++){
+     let id=Math.floor(Math.random()*58)
+     res+=CHARS[id]
+   }
+
+   return res
+
+}
+
 
 const connection=require('../config/connect')
 
@@ -103,4 +116,5 @@ module.exports={
     uuid:guid,
     query,
     fork,
+    randomName,
 }

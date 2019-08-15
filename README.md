@@ -81,3 +81,7 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 2.useRef获取最新对象引用，useState若需每次触发，则不能绑定在同一对象上，因为链表保持为对象的引用，hooks会判定其一直没有变化，不会再次触发hooks系列，正确方法为...等浅拷贝
 3.function components遇到use系列，则会返回对应其链表上最新的fiberNode.memoizedState(从缓存读取)
 
+2019.8.15
+
+1.ioredis针对复杂数据只能采用序列化，统一处理Model返回，取其实例的dataValues
+

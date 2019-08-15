@@ -5,11 +5,13 @@ import {Input} from 'antd'
 import styles from './index.less'
 
 export default (props)=>{
+
+    console.log(props)
   
     /**turn的参数为object {page_num:xx} */
     const {Search}=Input
 
-    const { placeholder, onSearch, width:width=250 }=props
+    const { placeholder,onSearch, width:width=250 }=props||{}
 
 
   return(

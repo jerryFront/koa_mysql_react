@@ -8,10 +8,14 @@ import Header from '@components/common/header'
 
 import styles from './index.less'
 
-
+const DeclareRef=Comp=>{
+  console.log(Comp.$ref,{...Comp})
+  return Comp.component({...Comp})
+}
 
 
 export default ()=>{
+
 
   const {Footer,Content}=Layout
 
@@ -87,7 +91,7 @@ export default ()=>{
 
         <Layout>
           <Header>
-            <Search placeholder="请输入文章关键字" onSearch={onSearch}></Search>
+            <DeclareRef component={Search} $ref={"search"} placeholder="请输入文章关键字" onSearch={onSearch} />
           </Header>
           <Content>
             

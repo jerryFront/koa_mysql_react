@@ -21,12 +21,11 @@ const signIn=async (req,next)=>{
 
    let re=await User.find(query)
 
-   if(re.length>0){ //登录成功，则写入token
+   if(re){ //登录成功，则写入token
       /**redis写入token
        * token策略 userid&&timestamp 再md5
        */
-      re=re[0].dataValues //返回的是一个User实体
-
+   
       const now=new Date().getTime()/1000
       const key=md5(`${re.id}&&{now}`)
 
@@ -56,8 +55,6 @@ const getUser=async (req,next)=>{
 
    let re=await User.find(query)
 
-   if(re&&re.length) re=re[0]
-   
    rep.reply(req,re)
     
 

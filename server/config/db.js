@@ -94,54 +94,64 @@ function defineModel(name,attributes){
             return
         }
 
-        const searchRedis=async key=>{
-           let res=await redis.get(key)
+        const findInRedis=async key=>{
+           let res=await redis.gets(key)
+           
            if(res) return res 
            //如redis匹配不到，则查询数据库
-           res = await findInDB() 
+           res = await findInDB(key) 
            return res
         }
 
-        const findInDB=async ()=>{
+               /**根据主键进行查询 */
+        const findByPk=async pk=>{
+           if(!pk||typeof pk==='object'){
+               console.error('findByPk need param string or number，not object or undefined')
+               return
+           }
+           const res = await Model.findByPk(params)  //没有findById此方法，百度坑
+           /**并更新缓存 */
+           updateRedis(res)
+
+           return res
+        } 
+
+        /**
+         * 如有key参数，表明其应该被缓存，但击穿，则查询到后，主动更新缓存
+         * 未带key，则表明无需缓存，每次从DB更新
+         *  */
+        const findInDB=async (key)=>{
 
          let res=null  
             
           //合并一下params.attributes中的exclude，将通用字段都隐去
-
           if(typeof params==='object'){
             const excludes=['version','status','updateAt','createAt']
             if(params.attributes){
                 //需要合并去重
                 params.attributes.exclude=[...new Set(params.attributes.exclude.concat(excludes))]
             }else params.attributes={exclude:excludes}
+
+            /**查询如果击穿缓存且是主键形式的查询，则需要更新缓存 */
+
             res = await Model.findAll(params)
-          }else{
 
-            res = await Model.findByPk(params)  //没有findById此方法，百度坑
-  
-          }
-          
-          return res
+            if(key) updateRedis(res,key)
+            
+
+          }else  //只有主键
+            res=await findByPk(params)
+
+            /**为了与缓存保持一致，这里统一处理，去除数组化 */
+            return Array.isArray(res)?res[0].dataValues:res.dataValues
         }
 
-        let _key=null
-        //匹配是否需要查询redis命中,string主键 or params只有一个类主键key的
-        if(typeof params==='string'){
-           _key=`${name}:${params}`
-           return  await searchRedis(_key)
-        } 
-        else if(Object.getOwnPropertyNames(params).length==1){
-            //判断其key是否是unique 主键?
-            if(Object.keys(params).every(it=>{
-                _key=params[it]
-                return !!(attrs[it].unique)
-            })){  //符合规则
-              _key=`${Model}:${_key}`
-              return await searchRedis(_key)
-            }else return await findInDB()
-        }
+        /**优先匹配是否有符合缓存的规则 */
+        const _key=checkFitRedis(params)
 
-        else return await findInDB()
+        if(_key) return await findInRedis(_key)
+
+        else  return await findInDB()
 
     }
 
@@ -170,27 +180,83 @@ function defineModel(name,attributes){
 
     }
     
-    /**更新redis,在update和create的时候都需要处理 */
-    const updateRedis=(res,ex)=>{
+    /**
+     * 更新redis,在update和create以及查询击穿findByPk的时候都需要处理
+     * 参数key如有则直接mqSet，无则自行找出Pk，ex为自定义过期时间number
+     *  */
+    const updateRedis=(res,key,ex)=>{
 
-        if(res){
-            //更新对应缓存
-            let _key=null,_val=null
+        /**sequelize查询返回值均为 [object SequelizeInstance:xxx] 对象，需要处理成json */
+        if(!res) return
+
+        /**为了与缓存保持一致，这里统一处理，去除数组化 */
+        res=Array.isArray(res)?res[0].dataValues:res.dataValues
+  
+        //兼容key是否存在,因为key必定是string
+        if(key&&typeof key==='number'){
+            ex=key
+            key=null
+        }
+        if(key){ //如果key存在，则直接更新并返回
+            ex?redis.mqSet(key,res,ex):redis.mqSet(key,res)   
+            return
+        }else{ //key不存在，则查找PK或unique(可能不用PK查询或无PK)
+            //查找PK或unique过程，匹配规则，PK>unique
+            let _key=null //缓存的value一定都是res
             for(let i in attrs){
                if(attrs[i].primaryKey){
-                   _key=i;
-                   _val=res[i]                  
+                   _key=i;                
                    break;
                }
                if(attrs[i].unique){
                     _key=i;
-                    _val=res[i] 
                }
             }
-            _key=`${Model}:${_key}`
-            ex?redis.mqSet(_key,_val,ex):redis.mqSet(_key,_val)       
+            _key=`${name}:${_key}` 
+            ex?redis.mqSet(_key,res,ex):redis.mqSet(_key,res)       
         }
         
+    }
+
+
+     /**
+     * 判断请求是否符合缓存策略
+     * 实际情况下，params基本都是object
+     * 一定有where和attribute等属性,所以删除这些属性之后，判断是否仅有主键
+     * 若匹配到则返回 key(对应Model+Pk的值)，无匹配则返回null
+     */
+    const checkFitRedis=params=>{
+
+        let _key=null
+        
+        //匹配是否需要查询redis命中,string主键 or params只有一个类主键key的
+        if(typeof params==='string'){
+            _key=`${name}:${params}`
+            return key
+        } 
+        else{ //为object,否则validate步骤验证不通过
+
+            /**需浅拷贝params，用于判断，且不更改原params */
+            const _params={...params}   
+            delete _params.where 
+            delete _params.attributes
+
+             //实际场景下，一定有where和attribute等属性,所以删除这些属性之后，判断是否仅有主键
+            if(Object.keys(_params).length==1){ 
+                //判断其key是否是unique 主键?
+                if(Object.keys(_params).every(it=>{
+                    _key=params[it]
+                    return !!(attrs[it].unique||attrs[it].primaryKey) //是主键或者唯一
+                })){  //符合规则
+                  _key=`${name}:${_key}` //name为define时候的Model名
+                }
+            }  
+            
+            return _key
+
+        }
+
+
     }
 
 

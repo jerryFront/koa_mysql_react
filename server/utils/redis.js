@@ -8,7 +8,6 @@ const redis_config=require('../config/redisConfig.json')
 
 
 
-
 /**
  * 将client做为mq的核心分发处理器
  * 对外统一发布订阅，接收缓存更新 插入client.queue，
@@ -60,9 +59,22 @@ client.mqSet=(...obj)=>{
 
     //后续交给 client.list去模拟多线程处理client.queue
 
-    if(obj.length==2) client.set(obj[0],obj[1],'ex',300) //设置默认ex时间
+    if(obj.length==2||obj.length==3){
+      if(typeof obj[1]==='object') try{
+        obj[1]=JSON.stringify(obj[1])
+      }catch(e){
+
+      }
+    }
+    if(obj.length==2) client.set(obj[0],obj[1],'ex',defaultExpired) //设置默认ex时间
     else if(obj.length==3) client.set(obj[0],obj[1],'ex',obj[2])
-    else client.mset(obj.shift())
+    else{
+      const _obj=obj.shift(),_key=Object.keys(_obj)[0]
+      if(typeof _obj[_key]==='object') try{
+        _obj[_key]=JSON.stringify(_obj[_key])
+      }catch(e){}
+      client.mset(_obj)
+    }
 
 }
 
@@ -70,14 +82,28 @@ client.mqSet=(...obj)=>{
  * 获取或查询缓存是否命中
  * 遍历client.list里的列表，查询是否有命中
  * 由于set最终写入的都是Redis对象 同一处，而不是new出来的，
- * 所以不需要单独改造get
+ * 所以不需要单独改造get,但get需要将Object数据json序列化
  * 
  */
+client.gets=async key=>{
+   let res=await client.get(key)
+   if(typeof res==='string'){ //将string转换成object
+     try{
+       res=JSON.parse(res)
+     }catch(e){
+       console.error(e.toString())
+     }
+   }
+   return res
+}
 
 
-// client.mqSet('kk11',334,10)  //设置失效
-// client.mqSet({'kk2':44})
-// client.get('kk11').then(res=>console.log(res))
+
+// client.mqSet('kk11',{aa:545,ff:44},100)  //设置失效
+// client.gets('kk11').then(res=>{console.log(res)})
+
+// client.mqSet('kk111','55555',100)  //设置失效
+// client.gets('kk111').then(res=>{console.log(res)})
 
 
 

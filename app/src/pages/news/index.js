@@ -1,4 +1,4 @@
-import  React,{useRef,useState,useEffect,useContext} from 'react'
+import  React,{useRef,useState,useEffect,useContext,memo} from 'react'
 import {Layout,Row,Col,List,Skeleton} from 'antd'
 import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
@@ -8,10 +8,15 @@ import Header from '@components/common/header'
 
 import styles from './index.less'
 
-const DeclareRef=Comp=>{
-  console.log(Comp.$ref,{...Comp})
-  return Comp.component({...Comp})
-}
+
+const DeclareRef=memo(Comp=>{
+   const Com=React.useCallback(Comp.component({...Comp}),[Comp])
+   if(Comp.$ref!==undefined){
+     if(typeof Comp.$ref!=='object') console.error('attribute $ref must be object,better useRef')
+     else if(typeof Comp.$ref==='object') Comp.$ref.ref=Com
+   } 
+  return Com
+})
 
 
 export default ()=>{
@@ -27,7 +32,11 @@ export default ()=>{
 
   const [isLoading,res,error,setParams]=http.post('news/list',{page_num,})
 
+
+  let searchRef1={},searchRef2={}  //用于ref
+
   useEffect(()=>{
+    console.log(searchRef1.methods.aa(),searchRef2.methods.aa())
      setParams({
        page_num,
        title
@@ -91,7 +100,8 @@ export default ()=>{
 
         <Layout>
           <Header>
-            <DeclareRef component={Search} $ref={"search"} placeholder="请输入文章关键字" onSearch={onSearch} />
+            <DeclareRef component={Search} $ref={searchRef1} placeholder="请输入文章关键字" onSearch={onSearch} />
+            <DeclareRef component={Search} $ref={searchRef2} placeholder="请输入any" onSearch={onSearch} />
           </Header>
           <Content>
             

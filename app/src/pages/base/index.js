@@ -1,4 +1,4 @@
-import  React,{useReducer} from 'react'
+import  React,{useReducer,memo} from 'react'
 // v4 中改从 'react-router-dom'引入
 
 /**
@@ -33,10 +33,10 @@ const AsyncPage=path=>{
      * 返回的动态Component可以经过多重高阶组件的增强compose
      * withRouter是给props添加match.params 方便获取路由参数
      */
-    return withRouter(Loadable({
+    return withRouter(memo(Loadable({
         loader:()=>import(/* webpackInclude: /\.js$/ */ `@pages/${path}`),
         loading:Loader,
-    }))
+    })))
 }
 
 

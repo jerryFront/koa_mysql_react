@@ -85,3 +85,8 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 
 1.ioredis针对复杂数据只能采用序列化，统一处理Model返回，取其实例的dataValues
 
+2019.8.16
+
+1.replaceReducer 按需加载来优化redux(下一步尝试)
+2.自定义实现hooks对应的ref来统一封装子组件并合理运用缓存
+

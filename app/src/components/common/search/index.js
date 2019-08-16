@@ -1,27 +1,24 @@
 /**搜索相关 */
-import React,{useState,useEffect,useRef} from 'react'
+import React,{useState,useEffect,useRef,memo,useCallback} from 'react'
 import {Input} from 'antd'
-
 import styles from './index.less'
+import {use$Ref} from '@utils/ref'
 
 export default (props)=>{
 
     /**turn的参数为object {page_num:xx} */
     const {Search}=Input
 
-    const { placeholder,onSearch, width:width=250,$ref }=props||{}
+    const { placeholder,onSearch, width:width=250,}=props||{}
 
-    if($ref){
-      console.log($ref)
+    use$Ref(props,{
+      aa:()=>console.log(placeholder)
+    })
 
-      $ref["methods"]={
-        aa:()=>console.log(placeholder)
-      }
-    }
     
   return(
       <section className={`${styles.container}`}>
-         <Search placeholder={placeholder} onSearch={value=>onSearch(value)} style={{width}} enterButton></Search>
+         <Search placeholder={placeholder} onSearch={value=>onSearch(value,props.$ref)} style={{width}} enterButton></Search>
       </section>
   )
 

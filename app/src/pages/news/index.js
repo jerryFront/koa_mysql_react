@@ -5,18 +5,9 @@ import  http from '@utils/fetch'
 import TurnPage from '@components/common/turn_page'
 import Search from '@components/common/search'
 import Header from '@components/common/header'
+import {DeclareRef} from '@utils/ref'
 
 import styles from './index.less'
-
-
-const DeclareRef=memo(Comp=>{
-   const Com=React.useCallback(Comp.component({...Comp}),[Comp])
-   if(Comp.$ref!==undefined){
-     if(typeof Comp.$ref!=='object') console.error('attribute $ref must be object,better useRef')
-     else if(typeof Comp.$ref==='object') Comp.$ref.ref=Com
-   } 
-  return Com
-})
 
 
 export default ()=>{
@@ -36,7 +27,6 @@ export default ()=>{
   let searchRef1={},searchRef2={}  //用于ref
 
   useEffect(()=>{
-    console.log(searchRef1.methods.aa(),searchRef2.methods.aa())
      setParams({
        page_num,
        title
@@ -89,7 +79,8 @@ export default ()=>{
      if(typeof num==='number'&&num>=0) setPageNum(num)
   }
 
-  const onSearch=(val)=>{
+  const onSearch=(val,ref)=>{
+    if(ref) ref.aa() 
     if(val==title) return //相同则不查询 
     setPageNum(0)
      setTitle(val)

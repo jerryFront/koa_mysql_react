@@ -7,7 +7,19 @@
  *
  * 以下为自己实现
  */
-import React,{memo,useCallback} from 'react'
+import React,{memo,useMemo,useCallback} from 'react'
+
+/**
+ * 注意区分memo,useMemo,useCallback三者的区别 
+ * 三者基本都是采用memorize方法缓存render结果，避免不必要的vdom diff到render的过程
+ * 
+ * memo和pureComponent类同，用于阻止组件的不必要render,
+ * 默认情况将preProps与props进行浅拷贝比较，如要深层次则自行实现第二个参数Function
+ * 
+ * 
+ * 
+ */
+
 
 /**
  * 将所有页面引入的子组件用DeclareRef封装
@@ -20,6 +32,8 @@ export const DeclareRef=memo(Component=>{
         console.error('use DeclareRef,you must declare component attribute ')
         return null
     }
+
+
     /**缓存对应Component的执行结果 */
     const Com=useCallback(Component.component({...Component}),[Component])
 
@@ -41,10 +55,10 @@ export const DeclareRef=memo(Component=>{
 
 /**
  * 在子组件里将所需要的attrs(key,value)格式等属性绑定到props下的$ref下(如果存在的话)
- * (子组件使用)
+ * (子组件使用) 利用useCallback来缓存不必要的再次执行
  */
-export const use$ref=memo((props,{...attrs})=>{
-   
+export const use$Ref1=(props,{...attrs})=>{
+
     if(!props||!props.$ref||typeof props.$ref!=='object'){
        if(!props) console.warn('use$ref ,you should has props and props.$ref attribute')
        if(props.$ref&&typeof props.$ref!=='object') console.warn('use$ref,props.$ref must be object and not const')
@@ -67,5 +81,10 @@ export const use$ref=memo((props,{...attrs})=>{
         console.error(e.toString())
     }
 
-})
+}
+
+
+export const use$Ref=(...args)=>{
+    return useCallback(use$Ref1(...args),[args[1]||null])
+}
 

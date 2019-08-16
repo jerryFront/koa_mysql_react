@@ -16,6 +16,7 @@ import React,{memo,useMemo,useCallback} from 'react'
  * memo和pureComponent类同，用于阻止组件的不必要render,
  * 默认情况将preProps与props进行浅拷贝比较，如要深层次则自行实现第二个参数Function
  * 
+ * useCallback(fn, inputs) === useMemo(() => fn, inputs))
  * 
  * 
  */

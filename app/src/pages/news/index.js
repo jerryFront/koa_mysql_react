@@ -1,4 +1,4 @@
-import  React,{useRef,useState,useEffect,useContext,memo} from 'react'
+import  React,{useRef,useState,useEffect,useCallback,useContext,memo} from 'react'
 import {Layout,Row,Col,List,Skeleton} from 'antd'
 import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
@@ -21,7 +21,7 @@ export default ()=>{
 
   const [title,setTitle]=useState('')  //模糊搜索
 
-  const [isLoading,res,error,setParams]=http.post('news/list',{page_num,})
+  const [isLoading,res,error,setParams]=useCallback(http.post('news/list',{page_num,}))
 
 
   let searchRef1={},searchRef2={}  //用于ref

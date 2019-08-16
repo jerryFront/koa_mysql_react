@@ -21,17 +21,24 @@ export default ()=>{
 
   const [title,setTitle]=useState('')  //模糊搜索
 
-  const [isLoading,res,error,setParams]=useCallback(http.post('news/list',{page_num,}))
+  const [isLoading,res,error,setParams]=[true,{},null]
+
+  const useFetch=useCallback(()=>http.post('news/list',{page_num,title}),[page_num,title])
+
+  const DataBounday=useFetch()
+
+
+ 
 
 
   let searchRef1={},searchRef2={}  //用于ref
 
-  useEffect(()=>{
-     setParams({
-       page_num,
-       title
-     })
-  },[page_num,title])
+  // useEffect(()=>{
+  //    setParams({
+  //      page_num,
+  //      title
+  //    })
+  // },[page_num,title])
 
   const RenderList=({res})=>{
 
@@ -98,6 +105,8 @@ export default ()=>{
             
               <Row>
                 <Col lg={24} xl={{span:16,offset:4}}>
+
+                {DataBounday(RenderList)}
 
                  {
                   res&&res.count&&(

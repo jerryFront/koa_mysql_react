@@ -1,6 +1,6 @@
 import axios from 'axios'
-import React,{useState,useEffect,useCallback,useRef} from 'react'
-import {message,Spin} from 'antd'
+import React,{useState,useEffect,useCallback} from 'react'
+import {message} from 'antd'
 import {timeout,rootPath} from '@configs/const'
 import {getStorage,removeStorage} from '@utils/storage'
 
@@ -32,7 +32,6 @@ const beforeRequest=(list,url,data)=>{
     }
 }
 
-
 const beforeHttp=beforeRequest(blackList)
 
 
@@ -51,8 +50,6 @@ const baseConfig={
       return status>=200 && status<300
     }
 }
-
-
 
 
 export default class http{
@@ -99,13 +96,13 @@ export default class http{
   static request(args){
 
     
-    const [url,data]=args 
+    const [url]=args 
 
 
+    //需要监听data变化的时候，必须设置其为hook相关
+    const [data,setData]=useState(args[1])
 
-    //需要监听data变化的时候，必须设置其为hook相关(采用ref来对比参数变化)
-
-    const currentData=useRef()
+    // const data=useRef(args[1])
 
     const [isLoading,setIsLoading]=useState(false)
     const [res,setRes]=useState(null)
@@ -113,12 +110,28 @@ export default class http{
 
     const isPost=baseConfig.method==='post'?true:false
 
+    
 
- 
 
+    //暂时用dom去创建loading加载
 
+    useEffect(()=>{
+
+      const loading=document.getElementById('loading')
+      if(isLoading){
+        loading.setAttribute('style','display:block')
+      }else{
+        setTimeout(()=>{
+          loading.setAttribute('style','display:none')
+        },500)
+
+      }
+
+    },[isLoading])
+    
 
     const fetch=useCallback(async ()=>{
+
 
       /**
        * 如果没有带任何参数即undefined时候，不请求数据
@@ -183,53 +196,16 @@ export default class http{
       }
 
 
-    },[url,data])
+    },[data])
+      
 
-   
-    
     useEffect(()=>{
 
-      currentData.current=data
- 
-      /**
-       * 如果请求有更新，则放弃之前的
-       * 如果需要在参数变化后重新请求，如果参数频繁更新，会出现竞态（旧的请求因为慢，晚于后发的请求 resolve）的问题
-       *  */
-      if(currentData.current!==data) return
- 
-      fetch()
- 
-     },[currentData])
- 
+      fetch() 
+   
+    },[fetch])
 
-
-    /**利用renderProps来返回通用化的Component children 卡槽式 */
-
-    const DataBounday=useCallback(renderChildren=>{
-
-      console.log(isLoading,res)
-
-      if(error) return <div>error</div>
-      else if(isLoading) return <Spin tip="Loading..."  size="large" />
-      else if(res) return renderChildren({res})
-      else return null
-
-    },[isLoading,res,error])
-
-
-    // function DataBounday(renderChildren){
-
-    //     console.log(res)
-
-    //     if(error) return <div>error</div>
-    //     else if(isLoading) return <Spin tip="Loading..."  size="large" />
-      
-    //     return renderChildren(res)
-            
-    // } 
-      
-
-     return DataBounday
+     return [isLoading,res,error,setData]
 
   }
 

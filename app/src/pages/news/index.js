@@ -1,4 +1,4 @@
-import  React,{useRef,useState,useEffect,useCallback,useContext,memo} from 'react'
+import  React,{useRef,useState,useEffect,useCallback,useContext,useMemo} from 'react'
 import {Layout,Row,Col,List,Skeleton} from 'antd'
 import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
@@ -21,36 +21,25 @@ export default ()=>{
 
   const [title,setTitle]=useState('')  //模糊搜索
 
-  const [isLoading,res,error,setParams]=[true,{},null]
-
   const useFetch=useCallback(()=>http.post('news/list',{page_num,title}),[page_num,title])
 
   const DataBounday=useFetch()
 
 
- 
-
-
   let searchRef1={},searchRef2={}  //用于ref
-
-  // useEffect(()=>{
-  //    setParams({
-  //      page_num,
-  //      title
-  //    })
-  // },[page_num,title])
 
   const RenderList=({res})=>{
 
     if(res&&res.rows&&res.rows.length) list=list.concat(res.rows)
 
     if(list&&list.length) return (
+    <div>  
     <List className="main-list"
-     loading={isLoading} itemLayout="horizontal"
+     loading={!res} itemLayout="horizontal"
      dataSource={list}
      renderItem={item=>(
       <List.Item>
-        <Skeleton avatar title loading={isLoading} description>
+        <Skeleton avatar title loading={!res} description>
              <List.Item.Meta  
              avatar={
                <img src={item.thumb_img} />
@@ -68,12 +57,11 @@ export default ()=>{
     
       </List.Item> 
      )}
-    >
-    </List>
-
- 
-
+    />
+    <TurnPage count={res.count} page_num={page_num} turn={turnPage}></TurnPage>
+    </div>
     )
+
     else return null
     
   }
@@ -90,7 +78,7 @@ export default ()=>{
     if(ref) ref.aa() 
     if(val==title) return //相同则不查询 
     setPageNum(0)
-     setTitle(val)
+    setTitle(val)
   }
 
     return (
@@ -108,14 +96,14 @@ export default ()=>{
 
                 {DataBounday(RenderList)}
 
-                 {
+                 {/* {
                   res&&res.count&&(
                     <div>             
                     <RenderList res={res}></RenderList>
-                    <TurnPage count={res.count} page_num={page_num} turn={turnPage}></TurnPage>
+
                     </div> 
                   )
-                 } 
+                 }  */}
 
 
                 </Col>

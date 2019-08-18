@@ -90,3 +90,7 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 1.replaceReducer 按需加载来优化redux(下一步尝试)
 2.自定义实现hooks对应的ref来统一封装子组件并合理运用缓存
 
+2019.8.18
+
+1.useCallback的监听必须是hooks相关变量，才能捕捉到变化，普通变量监听不到
+

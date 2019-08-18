@@ -5,6 +5,7 @@ import {timeout,rootPath} from '@configs/const'
 import {getStorage,removeStorage} from '@utils/storage'
 
 
+
 const md5=require('md5')
 const qs=require('qs')
 
@@ -32,7 +33,6 @@ const beforeRequest=(list,url,data)=>{
     }
 }
 
-
 const beforeHttp=beforeRequest(blackList)
 
 
@@ -51,8 +51,6 @@ const baseConfig={
       return status>=200 && status<300
     }
 }
-
-
 
 
 export default class http{
@@ -96,27 +94,31 @@ export default class http{
 
 
   //采用hooks处理方式
+  /**
+   * 
+   * @param {*} args 
+   * 正常接收url,data([object])两个参数,此时统一处理错误返回非200，返回res.data
+   * 如传有第三个参数!!type===true,则此时除了处理特殊错误，其他原样返回res 
+   * 
+   */
   static request(args){
 
     
-    const [url,data]=args 
+    const [url]=args 
 
 
-
-    //需要监听data变化的时候，必须设置其为hook相关(采用ref来对比参数变化)
+    //需要监听data变化的时候，必须设置其为hook相关
+    const [data,setData]=useState(args[1])
 
     const currentData=useRef()
+
 
     const [isLoading,setIsLoading]=useState(false)
     const [res,setRes]=useState(null)
     const [error,setError]=useState(null)
 
     const isPost=baseConfig.method==='post'?true:false
-
-
- 
-
-
+    console.log(data)
 
     const fetch=useCallback(async ()=>{
 
@@ -170,66 +172,58 @@ export default class http{
           return
         }
 
+        /**如果args传递了第三个参数type，则表明需要自定义处理返回情况，此时原样返回 */
         if(res.code&&res.code!==200){
-          message.error(res.msg,6)
-          return
+          if(args.length<3||!args[3]){
+            message.error(res.msg,6)
+            return
+          }else{ //传有意义的type !!type===true
+             return res
+          }
         }
+
         
         setRes(res.data)
-
+        
       }catch(e){
         setIsLoading(false)
         setError(e)   
       }
 
 
-    },[url,data])
+    },[data])
 
-   
-    
+    /**useCallback的监听必须是hooks相关变量，才能捕捉到变化，普通变量监听不到 */
+
+
     useEffect(()=>{
 
       currentData.current=data
- 
-      /**
-       * 如果请求有更新，则放弃之前的
-       * 如果需要在参数变化后重新请求，如果参数频繁更新，会出现竞态（旧的请求因为慢，晚于后发的请求 resolve）的问题
-       *  */
-      if(currentData.current!==data) return
- 
-      fetch()
- 
-     },[currentData])
- 
 
+     /**
+     * 如果请求有更新，则放弃之前的
+     * 如果需要在参数变化后重新请求，如果参数频繁更新，会出现竞态（旧的请求因为慢，晚于后发的请求 resolve）的问题
+     *  */
+      if(currentData.current!==data) return 
 
-    /**利用renderProps来返回通用化的Component children 卡槽式 */
+      fetch() 
+   
+    },[fetch])
 
-    const DataBounday=useCallback(renderChildren=>{
+        /**利用renderProps来返回通用化的Component children 卡槽式 */
 
-      console.log(isLoading,res)
+        const DataBounday=useCallback(renderChildren=>{
 
-      if(error) return <div>error</div>
-      else if(isLoading) return <Spin tip="Loading..."  size="large" />
-      else if(res) return renderChildren({res})
-      else return null
+          if(error) return <div>error</div>
+          else if(isLoading) return <Spin className="flex1" tip="Loading..."  size="large" />
+          else if(res) return renderChildren({res,error}) //返回结果和error(可能需要单独处理error的场景)
+          else return null
+    
+        },[isLoading,res,error])
+    
 
-    },[isLoading,res,error])
-
-
-    // function DataBounday(renderChildren){
-
-    //     console.log(res)
-
-    //     if(error) return <div>error</div>
-    //     else if(isLoading) return <Spin tip="Loading..."  size="large" />
-      
-    //     return renderChildren(res)
-            
-    // } 
-      
-
-     return DataBounday
+         /**同时返回renderProps的模板处理函数 以及动态setData函数(很多场景需要动态改变触发，比如翻页搜索等) 和 获取的res结果(可能出现不render只单纯获取数据的场景) */
+         return {DataBounday,setData,res}  
 
   }
 

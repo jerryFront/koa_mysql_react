@@ -21,9 +21,18 @@ export default ()=>{
 
   const [title,setTitle]=useState('')  //模糊搜索
 
-  const useFetch=useCallback(()=>http.post('news/list',{page_num,title}),[page_num,title])
+  const fetchList=useCallback(()=>http.post('news/list',{page_num,title}),[page_num,title])
 
-  const DataBounday=useFetch()
+  const {DataBounday,setData}=fetchList()
+
+
+  useEffect(()=>{
+    setData({
+      page_num,
+      title,
+    })
+  },[page_num,title])
+
 
 
   let searchRef1={},searchRef2={}  //用于ref

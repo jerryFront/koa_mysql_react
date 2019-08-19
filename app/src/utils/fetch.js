@@ -214,7 +214,7 @@ export default class http{
         const DataBoundary=useCallback(renderChildren=>{
 
           if(error) return <div>error</div>
-          else if(isLoading) return <Spin className="flex1" tip="Loading..."  size="large" />
+          else if(isLoading) return<div className="flex-center inline-loading"><Spin   tip="Loading..."  size="large" /></div> 
           else if(res) return renderChildren({res,error}) //返回结果和error(可能需要单独处理error的场景)
           else return null
     

@@ -1,4 +1,4 @@
-import {register} from '../../serviceWorker'
+import {register} from './serviceWorkerInstall'
 
 register({})
 
@@ -12,4 +12,4 @@ ReactDOM.render(
     document.getElementById('app')
 )
 
-ReactDOM.render(<Loader />,document.getElementById('loading'))
+// ReactDOM.render(<Loader />,document.getElementById('loading'))

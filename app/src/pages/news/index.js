@@ -23,7 +23,7 @@ export default ()=>{
 
   const fetchList=useCallback(()=>http.post('news/list',{page_num,title}),[page_num,title])
 
-  const {DataBounday,setData}=fetchList()
+  const [DataBounday,setData]=fetchList()
 
 
   useEffect(()=>{

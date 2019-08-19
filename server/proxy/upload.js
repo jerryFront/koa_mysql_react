@@ -33,7 +33,7 @@ const fileUpload=async (req,next)=>{
         /**文件名 以时间戳+原文件名命名 */
         const newFileName=new Date().getTime()+'_'+randomName(8)+ext
         const now=new Date()
-        const date=`${now.getFullYear()}${now.getMonth()>9?now.getMonth():'0'+now.getMonth()}${now.getDate()}`
+        const date=`${now.getFullYear()}${now.getMonth()>8?(now.getMonth()+1):'0'+(now.getMonth()+1)}${now.getDate()}`
         const tempPath=`../assets/${date}`
         const targetPath=path.join(__dirname,tempPath)
 

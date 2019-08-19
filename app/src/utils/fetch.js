@@ -118,7 +118,6 @@ export default class http{
     const [error,setError]=useState(null)
 
     const isPost=baseConfig.method==='post'?true:false
-    console.log(data)
 
     const fetch=useCallback(async ()=>{
 
@@ -212,7 +211,7 @@ export default class http{
 
         /**利用renderProps来返回通用化的Component children 卡槽式 */
 
-        const DataBounday=useCallback(renderChildren=>{
+        const DataBoundary=useCallback(renderChildren=>{
 
           if(error) return <div>error</div>
           else if(isLoading) return <Spin className="flex1" tip="Loading..."  size="large" />
@@ -223,7 +222,7 @@ export default class http{
     
 
          /**同时返回renderProps的模板处理函数 以及动态setData函数(很多场景需要动态改变触发，比如翻页搜索等) 和 获取的res结果(可能出现不render只单纯获取数据的场景) */
-         return {DataBounday,setData,res}  
+         return [DataBoundary,setData,res,isLoading]  
 
   }
 

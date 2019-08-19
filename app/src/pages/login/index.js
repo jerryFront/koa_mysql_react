@@ -1,5 +1,5 @@
 import  React from 'react'
-import {useRef,useState,useLayoutEffect} from 'react'
+import {useRef,useState,useLayoutEffect,useCallback} from 'react'
 import {Form,Icon,Input,Button,Checkbox} from 'antd'
 import {setStorage} from '@utils/storage'
 
@@ -15,7 +15,7 @@ export default (props)=>{
     const [username,setUsername]=useState('')
     const [password,setPassword]=useState('')
 
-    const [isLoading,res,error,setParams]=http.post('user/login',null)
+    const [DataBound,setParams,res]=http.post('user/login',null)
 
 
     useLayoutEffect(()=>{

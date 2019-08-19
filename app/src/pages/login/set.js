@@ -32,15 +32,19 @@ const beforeUpload=file=>{
 
 const {Content}=Layout
 
-export default (props)=>{
+export default ()=>{
 
     const [loading,setLoading]=useState(false)
 
-    const [isLoading,res]=http.get('user/info',user_id?{id:user_id}:null)
+    const fetchUser=useCallback(()=>http.get('user/info',user_id?{id:user_id}:null),[])
+    const [DataBound,,res]=fetchUser()
 
-    const [isLoad,res1,error,setParams]=http.post('upload/image',null)
+    const uploadImage=useCallback(()=>http.post('upload/image',null),[]) 
+    const [,setParams,res1]=uploadImage()
 
-    const [isLoading2,res2,error2,setParams2]=http.post('user/update',null)
+
+    const updateUser=useCallback(()=>http.post('user/update',null),[])
+    const [,setParams2,res2,isLoading2]=updateUser()
 
 
     //用来记录最新数据，不一定是更新成功的，因为update返回的只有成功，避免再请求一遍get，采用ref记录每次最新的res
@@ -55,20 +59,20 @@ export default (props)=>{
     useLayoutEffect(()=>{
         if(res2){
             message.success('数据更新成功')
-            /**更新之后同时也更新缓存 */
-            setStorage('user_info')(ref.current)
+            /**更新之后同时也更新缓存,需合并处理 */
+            const info=getStorage('user_info')
+            setStorage('user_info')(info?{...info,...ref.current}:ref.current)
         }  
     },[res2])
+
 
     const handleChange=info=>{
            if(!info||!info.file) return
            if(!beforeUpload(info.file)||loading) return //避免多次重复请求
-
            setLoading(true)
            getBase64(info.file.originFileObj,imageUrl=>{
-              setParams({image:imageUrl}) //触发上传
+            setParams({image:imageUrl}) //触发上传
            })
-
     }
 
     const inputChange=(e,type)=>{
@@ -99,7 +103,7 @@ export default (props)=>{
 
             <Col lg={24} xl={{span:16,offset:4}}>
 
-              {
+              {DataBound(({res})=>
                res&&(
                    <Card title="个人信息" bordered={false}>
                        
@@ -145,8 +149,7 @@ export default (props)=>{
                        
 
                     </Card>
-               )
-
+               ))
               }
 
             </Col>

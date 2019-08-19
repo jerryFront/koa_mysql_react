@@ -205,11 +205,11 @@ function defineModel(name,attributes){
             let _key=null //缓存的value一定都是res
             for(let i in attrs){
                if(attrs[i].primaryKey){
-                   _key=i;                
+                   _key=res[i];                
                    break;
                }
                if(attrs[i].unique){
-                    _key=i;
+                    _key=res[i];
                }
             }
             _key=`${name}:${_key}` 
@@ -283,8 +283,12 @@ function defineModel(name,attributes){
         }
         //寻找主键，primaryKey:true或第一个unique存在的列
         /**update两个参数 一个params，一个where语句 */
-        let res=await Model.update(params,params)
-        
+        let [res]=await Model.update(params,params)
+
+        /**update返回的结果只是[1],即受影响的行，则更新缓存需要根据update结果来判定再去查询一次 */
+        if(res>0) //res为受影响的行
+        res=await Model.findAll(params)
+
         updateRedis(res,ex)
 
         return res 

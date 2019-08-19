@@ -1,4 +1,4 @@
-import  React,{useRef,useState,useEffect,useContext} from 'react'
+import  React,{useRef,useState,useEffect,useCallback} from 'react'
 import {Layout,Row,Col,Card} from 'antd'
 import  http from '@utils/fetch'
 
@@ -8,22 +8,18 @@ import styles from './index.less'
 
 export default props=>{
    
-  const initData={
-    uid:props.match.params.uid,
-  }
+
+  const [uid]=useState(props.match.params.uid)
 
 
-
-
-  const [isLoading,res,error,setParams]=http.post('news/getDetail',initData)
+  const fetchDetail=useCallback(()=>http.post('news/getDetail',{uid}),[uid])
   
-  
+  const [DataBound]=fetchDetail()
+
 
   const {Header,Footer,Content}=Layout
 
   
-
-
 
     return (
         <section className={styles.container}>
@@ -38,14 +34,13 @@ export default props=>{
                 <Col lg={24} xl={{span:16,offset:4}}>
                  
     
-                 {
-                  res&&(
+                 {DataBound(({res})=>res&&(
                     <Card title="文章详情" bordered={false}>
                        
                        <div dangerouslySetInnerHTML={{__html: res.content}}></div>
 
                     </Card>
-                  )
+                  ))
                 } 
 
                 </Col>

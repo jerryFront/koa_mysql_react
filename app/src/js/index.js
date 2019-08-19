@@ -1,3 +1,7 @@
+import {register} from '../../serviceWorker'
+
+register({})
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {App,Loader} from '@pages/base/index'

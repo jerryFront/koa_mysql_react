@@ -8,8 +8,8 @@ const {hash} = require('./hash')
 const OpenBrowserPlugin = require('open-browser-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const AutoDllPlugin = require('autodll-webpack-plugin')
+const PORT = require('./hash').PORT
 
-const PORT = 8898
 const resolve=name=>{
     return path.join(__dirname,name)
 }

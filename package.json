@@ -4,7 +4,7 @@
     "start": "node ./app.js",
     "host":"node ./cluster.js",
     "dev": "webpack-dev-server --config ./app/scripts/webpack.dev.config.js",
-    "test": "webpack --watch --config ./app/scripts/webpack.test.config.js",
+    "test": "webpack --watch NODE_ENV=development --config ./app/scripts/webpack.test.config.js",
     "build": "webpack --config ./app/scripts/webpack.prod.config.js"
   },
   "dependencies": {

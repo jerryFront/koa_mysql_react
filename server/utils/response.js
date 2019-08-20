@@ -49,8 +49,23 @@
  }
 
 
+ /**
+  * 直接格式化返回第三方返回的数据
+  * 如果第三方有data,code（为object）则原样返回
+  * 否则返回601 
+  */
+ const threeReply=(req,res)=>{
+    
+    if(res&&typeof res==='object'&&res.code){
+        req.response.body=res
+    }else req.response.body=response(null,'0601')
+
+ }
+
+
  module.exports={
      request,
      response,
      reply,
+     threeReply,
  }

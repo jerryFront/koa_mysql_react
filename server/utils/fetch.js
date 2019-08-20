@@ -45,8 +45,8 @@ const httpRequest=(host,method='get',headrType=0)=>{
    const headers=getHeader()
 
    const http=(url,params)=>{
-       const su=(method&&method=='post')?superagent.post(url,data):superagent.get(url,data)
-       Object.keys(headers).foeEach(i=>{
+       const su=(method&&method=='post')?superagent.post(url,params):superagent.get(url,params)
+       Object.keys(headers).forEach(i=>{
            su.set(i,headers[i])
        })
        return su
@@ -54,16 +54,20 @@ const httpRequest=(host,method='get',headrType=0)=>{
 
    return async(url,params)=>{
 
-      let res=await http(url,params)
+      let res=await http(host+url,params)
 
       if(res&&res.status===200){
         /**每次重新更新cookie，如果response返回了cookie的话 */
         headers['Cookie']=(res.headers&&res.headers.Cookie)?res.headers.Cookie:''
-        res=res.text
+        try {
+           res=JSON.parse(res.text)
+        }catch(e){
+           console.error(e.toString())
+        }
       }else{ //返回失败
         console.error('拉取数据失败:'+res.status)
         res={
-            code:'0601'
+           code:'0601',
         }
       }
 

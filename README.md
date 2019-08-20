@@ -94,3 +94,8 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 
 1.useCallback的监听必须是hooks相关变量，才能捕捉到变化，普通变量监听不到
 
+2019.8.20
+
+1.React.Fragment包裹，类似template，不引入多余的dom层级
+2.service worker 只是一个驻留在我们的 app 内的一个  JavaScript 文件 (注意，这个文件的url 是相对于 origin， 而不是相对于引用它的那个 JS 文件)
+3.service worker工作再worker context，没有DOM的访问权限

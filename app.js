@@ -61,6 +61,15 @@ async function logger(ctx,next){
 
 
 /**
+ * 只做转发的第三方请求不需要鉴权
+ * 设置其匹配规则
+ *  */
+const whiteList=[
+   /^\/music-api\/*/g,
+]
+
+
+/**
  * 
  * @param {*} ctx 
  * @param {*} next 
@@ -71,6 +80,13 @@ async function logger(ctx,next){
  */
 async function checkController(ctx,next){
 
+   
+   /**
+    * 将对应第三方请求转发等直接不鉴权验证
+    * 抛开特定的第三方白名单外，都走鉴权
+    *  */ 
+   if(!whiteList.some(reg=>reg.test(ctx.url))){
+       
 
     //设置跨域cors
     ctx.set('Access-Control-Allow-Origin','*')
@@ -92,6 +108,7 @@ async function checkController(ctx,next){
 
     }
 
+  } 
 
     await next()
 
@@ -113,6 +130,8 @@ app.use(all)
 app.use(require('./server/router/user').routes())
 app.use(require('./server/router/news').routes())
 app.use(require('./server/router/common').routes())
+
+app.use(require('./server/router/music').routes())
 
 
 

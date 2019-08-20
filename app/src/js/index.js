@@ -1,6 +1,13 @@
 import {register} from './serviceWorkerInstall'
 
-register({})
+register({
+    onUpdate(registration){
+      console.log(registration)
+    },
+    onSuccess(registration){
+      console.log(registration) 
+    }
+})
 
 import React from 'react'
 import ReactDOM from 'react-dom'

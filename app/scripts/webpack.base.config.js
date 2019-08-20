@@ -33,6 +33,7 @@ const webpackConfigBase = {
             '@middleware': path.join(__dirname, '../src/middleware'),
             '@pages': path.join(__dirname, '../src/pages'),
             '@js': path.join(__dirname, '../src/js'),
+            '@scripts':path.join(__dirname,'../scripts'), 
             '@styles': path.join(__dirname, '../src/styles'),
             '@pages': path.join(__dirname, '../src/pages'),
             '@utils':path.join(__dirname,'../src/utils'),

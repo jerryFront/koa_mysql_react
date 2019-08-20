@@ -1,7 +1,9 @@
 /**
  * 有关serviceWorker的使用
  */
+ const PORT=require('@scripts/hash').PORT
 
+ 
  const isLocalhost=Boolean(window.location.hostname==='localhost'||
  //IPV6                              
  window.location.hostname==='[::1]'||
@@ -15,21 +17,25 @@
 
       window.addEventListener('load',()=>{
 
-        const swUrl='./service_worker.js'
+        /**这个文件的url 是相对于 origin， 而不是相对于引用它的那个 JS 文件 */
 
-        // if(isLocalhost){
+        let swUrl='./app/src/js/service_worker.js'
 
-        //     /**检查serviceWorker是否还存在,走网络fetch */
-        //     checkValidServiceWorker(swUrl,config)
+        if(isLocalhost){
 
-        //     navigator.serviceWorker.ready.then(()=>{
-        //         console.log('the web app is first cached by a service worker')
-        //     })
+            swUrl=`http://${window.location.hostname}:${PORT}/js/service_worker.js`
 
-        // }else{  //走本地
+            /**检查serviceWorker是否还存在,走网络fetch */
+            checkValidServiceWorker(swUrl,config)
+
+            navigator.serviceWorker.ready.then(()=>{
+                console.log('the web app is first cached by a service worker')
+            })
+
+        }else{  //走本地
 
             registerValidSW(swUrl,config)
-        // }
+        }
 
       })
      

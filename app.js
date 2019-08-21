@@ -65,7 +65,7 @@ async function logger(ctx,next){
  * 设置其匹配规则
  *  */
 const whiteList=[
-   /^\/music-api\/*/g,
+   /^\/music-api\/*/,
 ]
 
 
@@ -80,13 +80,16 @@ const whiteList=[
  */
 async function checkController(ctx,next){
 
-   
    /**
     * 将对应第三方请求转发等直接不鉴权验证
     * 抛开特定的第三方白名单外，都走鉴权
     *  */ 
-   if(!whiteList.some(reg=>reg.test(ctx.url))){
-       
+
+
+
+   const flag=whiteList.some(reg=>reg.test(ctx.url))
+
+   if(!flag){
 
     //设置跨域cors
     ctx.set('Access-Control-Allow-Origin','*')
@@ -108,6 +111,11 @@ async function checkController(ctx,next){
 
     }
 
+  }else{
+    ctx.set('Access-Control-Allow-Origin','*')
+    ctx.set('Access-Control-Allow-Methods', 'PUT,DELETE,POST,GET')  //OPTIONS,
+    ctx.set('Access-Control-Allow-Headers', 'seqno,timestamp,sign,Content-Type,token')
+    ctx.set('Access-Control-Allow-Credentials', true);
   } 
 
     await next()

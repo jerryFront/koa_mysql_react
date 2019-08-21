@@ -171,6 +171,7 @@ export default class http{
           return
         }
 
+    
         /**如果args传递了第三个参数type，则表明需要自定义处理返回情况，此时原样返回 */
         if(res.code&&res.code!==200){
           if(args.length<3||!args[3]){
@@ -180,9 +181,13 @@ export default class http{
              return res
           }
         }
-
-        
-        setRes(res.data)
+     
+        /**
+         * 
+         * 兼容第三方的转发请求，可能没有data字段
+         * 如果没有data字段则返回上一层res
+         *  */
+        setRes(res.data?res.data:res)
         
       }catch(e){
         setIsLoading(false)
@@ -220,7 +225,6 @@ export default class http{
     
         },[isLoading,res,error])
     
-
          /**同时返回renderProps的模板处理函数 以及动态setData函数(很多场景需要动态改变触发，比如翻页搜索等) 和 获取的res结果(可能出现不render只单纯获取数据的场景) */
          return [DataBoundary,setData,res,isLoading]  
 

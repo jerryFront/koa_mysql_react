@@ -61,7 +61,7 @@ export default ()=>{
             message.success('数据更新成功')
             /**更新之后同时也更新缓存,需合并处理 */
             const info=getStorage('user_info')
-            setStorage('user_info')(info?{...info,...ref.current}:ref.current)
+            setStorage('user_info')(info?{...info,...ref.current}:ref)
         }  
     },[res2])
 

@@ -105,14 +105,6 @@ export default ()=>{
 
                 {DataBounday(RenderList)}
 
-                 {/* {
-                  res&&res.count&&(
-                    <div>             
-                    <RenderList res={res}></RenderList>
-
-                    </div> 
-                  )
-                 }  */}
 
 
                 </Col>

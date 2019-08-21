@@ -69,7 +69,7 @@ export function App(){
     return (
        <HashRouter>
           <Switch>
-              <Route4 path="/" exact component={AsyncPage('news/index')}></Route4> 
+              <Route4 path="/" exact component={AsyncPage('music/index')}></Route4> 
               <Route4 path="/index"  component={AsyncPage('base/primary')}></Route4>
               <Route4 path="/set" exact  onEnter={isLogin} component={AsyncPage('login/set')}></Route4>
               <Route4 path="/login"  component={AsyncPage('login/index')}></Route4>

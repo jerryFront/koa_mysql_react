@@ -20,7 +20,7 @@ export default (props)=>{
    const renderImg=(item,index)=>{
 
      return (
-         <div key={index} onClick={tap?()=>tap(item):''}>
+         <div key={index} onClick={tap?()=>tap(item.targetId):''}>
          <img src={item.imageUrl} />
          </div>
      )   

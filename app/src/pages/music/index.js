@@ -19,26 +19,27 @@ export default ()=>{
   const {TabPane}=Tabs
 
 
-  const [page_num,setPageNum]=useState(0)
-
   const [title,setTitle]=useState('')  //模糊搜索
 
-  const fetchBanner=useCallback(()=>http.get('music-api/banner',{}),[])
+  const [cat,setTag]=useState('')
 
+  const fetchBanner=useCallback(()=>http.get('music-api/banner',{}),[])
   const [,,banners]=fetchBanner()
 
-  const fetchPersonlized=useCallback(()=>http.get('music-api/personalized',{}),[])
+  const fetchPlaylist=useCallback(()=>http.get('music-api/top/playlist/highquality',{cat,limit:30}),[cat])
+  const [renderPlaylist,setData,res]=fetchPlaylist()
 
-  const [renderPersonlized,]=fetchPersonlized()
+  const fetchNewest=useCallback(()=>http.get('music-api/album/newest',{}),[])
+  const [renderNewest,,newRes]=fetchNewest()
 
 
 
-  // useEffect(()=>{
-  //   setData({
-  //     page_num,
-  //     title,
-  //   })
-  // },[page_num,title])
+  useEffect(()=>{
+    setData({
+      cat,
+      limit:30,
+    })
+  },[cat])
 
 
 
@@ -58,22 +59,46 @@ export default ()=>{
   }
 
   /**banner点击,跳转详情 */
-  const tapBanner=(item)=>{
+  const tapBanner=(id)=>{
+    console.log(id)
+  }
 
-    console.log(item)
-
+  /**专辑详情跳转 */
+  const tapPlaylist=id=>{
+    console.log(id)
   }
 
   /**tab切换 */
-  const switchTab=index=>{
-     console.log(index)
+  const switchTab=name=>{
+     setTag(name)
   }
+
+
+  /**渲染tabPane */
+  const renderTabPane=(name,res)=>{
+    
+    return (
+      <Card bordered={false}> 
+      <section className={`flex ${styles.personalizeContainer}`} >
+      {renderPlaylist(({res})=>
+                                  
+           res&&res.playlists&&res.playlists.map((item,index)=>renderCardItem(item,index)) 
+                            
+      )} 
+      </section>
+      </Card> 
+    )
+
+  }
+  
 
   /**渲染每个cardItem */
   const renderCardItem=(item,index)=>{
-    return (<div key={index}>{item.name}</div>)
+    return (<div className={styles.card} key={index} onClick={()=>tapPlaylist(item.id)}>
+      <img title={item.name} src={item.coverImgUrl?`${item.coverImgUrl}?param=200y200`:`${item.picUrl}?param=200y200`}></img>
+      <p title={item.name}>{item.name}</p>
+      </div>)
   }
-
 
 
 
@@ -95,31 +120,39 @@ export default ()=>{
               </section>   
 
 
-                <Col lg={24} xl={{span:16,offset:4}}>
+                <Col lg={24} xl={{span:18,offset:3}}>
 
-                  <Tabs defaultActiveKey="1" onChange={switchTab}>
-                      <TabPane tab="华语" key="1">
-                        
-                      {renderPersonlized(({res})=>(
-                        <Card bordered={false}> 
-                          {
-                           res&&res.result&&res.result.map((item,index)=>renderCardItem(item,index)) 
-                          }
-                        </Card> 
-                      ))
-                      } 
-
+                  <Tabs defaultActiveKey="" onChange={switchTab}>
+                      <TabPane tab="全部" key="">
+                        {renderTabPane('',res)} 
                       </TabPane> 
-                      <TabPane tab="流行" key="2">
-                          556
+                      <TabPane tab="华语" key="华语">
+                        {renderTabPane('',res)} 
                       </TabPane> 
-                      <TabPane tab="摇滚" key="3">
-                          999
+                      <TabPane tab="流行" key="流行">
+                        {renderTabPane('',res)} 
                       </TabPane> 
-
-
+                      <TabPane tab="摇滚" key="摇滚">
+                        {renderTabPane('',res)} 
+                      </TabPane> 
+                      <TabPane tab="民谣" key="民谣">
+                        {renderTabPane('',res)} 
+                      </TabPane> 
+                      <TabPane tab="电子" key="电子">
+                        {renderTabPane('',res)} 
+                      </TabPane> 
                   </Tabs>
 
+
+                  <Card bordered={false} title="新碟上架">
+                      <section className={`flex ${styles.newestCard}`}>
+                      {
+                         renderNewest(({res})=>res&&res.albums&&res.albums.map((item,index)=>
+                         renderCardItem(item,index)
+                         ))
+                      }
+                      </section>
+                  </Card>     
 
 
                   

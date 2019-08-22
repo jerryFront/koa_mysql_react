@@ -23,9 +23,12 @@ const comReducer=()=>{
 
 
 
+
+
 export default ()=>{
 
     const [commonState,dispatch]=comReducer()
+
 
     return(
      

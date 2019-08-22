@@ -2,7 +2,6 @@ import  React,{useRef,useState,useEffect,useCallback,useContext,useMemo} from 'r
 import {Layout,Row,Col,List,Skeleton,Tabs,Card} from 'antd'
 import { Link } from 'react-router-dom'
 import  http from '@utils/fetch'
-import TurnPage from '@components/common/turn_page'
 import Search from '@components/common/search'
 import Header from '@components/common/header'
 import Swiper from '@components/common/swiper'
@@ -10,14 +9,12 @@ import {DeclareRef} from '@utils/ref'
 
 import styles from './index.less'
 
+const {Footer,Content}=Layout
+const {TabPane}=Tabs
 
-export default ()=>{
+export default (props)=>{
 
-
-  const {Footer,Content}=Layout
-
-  const {TabPane}=Tabs
-
+  console.log(props)
 
   const [title,setTitle]=useState('')  //模糊搜索
 
@@ -95,8 +92,10 @@ export default ()=>{
   /**渲染每个cardItem */
   const renderCardItem=(item,index)=>{
     return (<div className={styles.card} key={index} onClick={()=>tapPlaylist(item.id)}>
+      <Link to={`/playlist/detail/${item.id}`}>
       <img title={item.name} src={item.coverImgUrl?`${item.coverImgUrl}?param=200y200`:`${item.picUrl}?param=200y200`}></img>
       <p title={item.name}>{item.name}</p>
+      </Link>
       </div>)
   }
 

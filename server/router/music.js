@@ -10,7 +10,7 @@ const apis=[
     'playlist/hot', 
     'banner', //首页banner
     'personalized', //推荐歌单
-    'playlist/detail', //推荐歌单的详情
+    'playlist/detail', //推荐歌单的详情(id)
     'top/artists', //歌手列表(默认分页)
     'artist/list', //字母选择歌手
     'artist/album', //获取歌手专辑(id，limit)

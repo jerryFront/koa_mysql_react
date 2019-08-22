@@ -8,11 +8,14 @@ import  React,{useReducer,memo} from 'react'
  */
 import {HashRouter,Route,Switch,Redirect,withRouter} from 'react-router-dom'
 import Loadable from 'react-loadable' //懒加载
-// import loadable from '@loadable/component'
 
 import styles from './index.less'
 import {Spin} from 'antd'
 import {isLogin} from './common'
+
+import {musicReducer} from '@reducers/music'
+import {reactReducer} from '@reducers/index'
+
 
 
 
@@ -33,11 +36,14 @@ const AsyncPage=path=>{
      * 返回的动态Component可以经过多重高阶组件的增强compose
      * withRouter是给props添加match.params 方便获取路由参数
      */
-    return withRouter(memo(Loadable({
+    return  withRouter(memo(Loadable({
         loader:()=>import(/* webpackInclude: /\.js$/ */ `@pages/${path}`),
         loading:Loader,
     })))
 }
+
+
+const commonContext=React.createContext(null)
 
 
 /**模拟处理onEnter */
@@ -66,21 +72,32 @@ export function App(){
      * v4 没有onEnter onLeave onUpdate 对应修改要到Route的生命周期对应
      */
 
+    const [musicState,dispatch,initHook]=reactReducer(musicReducer,{
+        banners:null
+    })
+
+
     return (
+
        <HashRouter>
           <Switch>
-              <Route4 path="/" exact component={AsyncPage('music/index')}></Route4> 
+          
+              <Route4 path="/" exact component={AsyncPage('music/index')}></Route4>
+              <Route4 path="/playlist/detail/:id" component={AsyncPage('music/playlist_detail')}></Route4> 
+         
+              
               <Route4 path="/index"  component={AsyncPage('base/primary')}></Route4>
               <Route4 path="/set" exact  onEnter={isLogin} component={AsyncPage('login/set')}></Route4>
               <Route4 path="/login"  component={AsyncPage('login/index')}></Route4>
               <Route4 path="/news" exact component={AsyncPage('news/index')}></Route4>
               <Route4 path="/news/detail/:uid" component={AsyncPage('news/detail')}></Route4>
-              
+             
             
              
               <Redirect to="/" />
           </Switch>
        </HashRouter>
+
     )
 }
 

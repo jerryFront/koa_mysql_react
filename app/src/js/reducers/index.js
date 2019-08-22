@@ -6,7 +6,7 @@
  * 
  */
 import React,{useReducer} from 'react'
-import {types} from './types'
+import * as types from './types'
 
 
 export const reactReducer=(reducer,state)=>{
@@ -27,7 +27,8 @@ export const reactReducer=(reducer,state)=>{
              console.error('function inithook should receive 2 paramters,type must be string')
              return 
          }
-         if(!types[type]){  //type必须在types里面有，否则无效
+         /**key为大写，value小写，一一对应 */
+         if(!types[type.toUpperCase()]){  //type必须在types里面有，否则无效
              console.error('type is invalid,should in types')
              return 
          }
@@ -40,7 +41,7 @@ export const reactReducer=(reducer,state)=>{
 
          states._init_hooks[type]=func
 
-         Promise.resolve(func).then(ress=>{
+         Promise.resolve(func()).then(ress=>{
              console.log(ress)
              if(ress&&ress.length>=3) dispatch(type,ress[3])
          })

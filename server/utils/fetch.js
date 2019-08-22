@@ -66,9 +66,7 @@ const httpRequest=(host,method='get',headrType=0)=>{
         }
       }else{ //返回失败
         console.error('拉取数据失败:'+res.status)
-        res={
-           code:'0601',
-        }
+        res=null
       }
 
       return res

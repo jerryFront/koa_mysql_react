@@ -7,21 +7,25 @@ import Header from '@components/common/header'
 import Swiper from '@components/common/swiper'
 import {DeclareRef} from '@utils/ref'
 
+import {musicContext} from '@pages/base/index'
+
 import styles from './index.less'
+
 
 const {Footer,Content}=Layout
 const {TabPane}=Tabs
 
-export default (props)=>{
+const Index=(props)=>{
 
-  console.log(props)
-
+  const {musicState,dispatch,initHook} = useContext(musicContext);
+ 
   const [title,setTitle]=useState('')  //模糊搜索
 
   const [cat,setTag]=useState('')
 
   const fetchBanner=useCallback(()=>http.get('music-api/banner',{}),[])
   const [,,banners]=fetchBanner()
+  // initHook('update_music_banner',fetchBanner)
 
   const fetchPlaylist=useCallback(()=>http.get('music-api/top/playlist/highquality',{cat,limit:30}),[cat])
   const [renderPlaylist,setData,res]=fetchPlaylist()
@@ -48,12 +52,6 @@ export default (props)=>{
      if(typeof num==='number'&&num>=0) setPageNum(num)
   }
 
-  const onSearch=(val,ref)=>{
-    if(ref) ref.aa() 
-    if(val==title) return //相同则不查询 
-    setPageNum(0)
-    setTitle(val)
-  }
 
   /**banner点击,跳转详情 */
   const tapBanner=(id)=>{
@@ -106,7 +104,7 @@ export default (props)=>{
 
         <Layout>
           <Header>
-            <DeclareRef component={Search} $ref={searchRef1} placeholder="请输入文章关键字" onSearch={onSearch} />
+            <DeclareRef component={Search} $ref={searchRef1} placeholder="请输入文章关键字"  />
           </Header>
           <Content>
             
@@ -172,3 +170,6 @@ export default (props)=>{
     )
 }
 
+
+
+export default Index

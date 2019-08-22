@@ -16,7 +16,7 @@ import {isLogin} from './common'
 import {musicReducer} from '@reducers/music'
 import {reactReducer} from '@reducers/index'
 
-
+export const musicContext=React.createContext(null)
 
 
 /**动态加载组件
@@ -43,7 +43,6 @@ const AsyncPage=path=>{
 }
 
 
-const commonContext=React.createContext(null)
 
 
 /**模拟处理onEnter */
@@ -71,10 +70,9 @@ export function App(){
      * exact 指定确定的路由
      * v4 没有onEnter onLeave onUpdate 对应修改要到Route的生命周期对应
      */
-
-    const [musicState,dispatch,initHook]=reactReducer(musicReducer,{
+     const [musicState,dispatch,initHook]=reactReducer(musicReducer,{
         banners:null
-    })
+      })
 
 
     return (
@@ -82,10 +80,11 @@ export function App(){
        <HashRouter>
           <Switch>
           
+              <musicContext.Provider value={{musicState,dispatch,initHook}}>
               <Route4 path="/" exact component={AsyncPage('music/index')}></Route4>
               <Route4 path="/playlist/detail/:id" component={AsyncPage('music/playlist_detail')}></Route4> 
-         
-              
+              </musicContext.Provider> 
+
               <Route4 path="/index"  component={AsyncPage('base/primary')}></Route4>
               <Route4 path="/set" exact  onEnter={isLogin} component={AsyncPage('login/set')}></Route4>
               <Route4 path="/login"  component={AsyncPage('login/index')}></Route4>

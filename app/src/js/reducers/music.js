@@ -1,18 +1,55 @@
 import * as types from './types'
 
 
-export const  reducer=(state,action)=>{
+const state={
+    banners:null
+}
 
-   switch(action.type){
+
+
+const initCase=(state)=>{
+    
+    const cases={}
+
+    Object.keys(state).forEach(it=>{
+        cases[it]
+    })
+
+}
+
+
+
+/**
+ * reducer与state的绑定只有一次，即使用useReducer来操作
+ * 在reducer里默认创建state下所有propertyName的处理情况
+ * 
+ *  */
+export const  musicReducer=(state,action)=>{
+
+
+   const {type}=action
+   
+
+  
+   switch(type){
+       
+       case 'banners':
+           return {
+            ...state,   
+            banners:action.data
+           }
+     
        case types.UPDATE_MUSIC_BANNER:
-           return Object.assign({},state,{
-               banners:action.data
-           }) 
+            return {
+                ...state,   
+                banners:action.data
+               }
        default:
            return state;   
    }
 
 }
+
 
 
 

@@ -18,14 +18,19 @@ const {TabPane}=Tabs
 const Index=(props)=>{
 
   const {musicState,dispatch,initHook} = useContext(musicContext);
+
+ 
  
   const [title,setTitle]=useState('')  //模糊搜索
 
   const [cat,setTag]=useState('')
 
   const fetchBanner=useCallback(()=>http.get('music-api/banner',{}),[])
-  const [,,banners]=fetchBanner()
-  // initHook('update_music_banner',fetchBanner)
+  const [,,banners]=[0,0,0]
+
+  // initHook('banners',[fetchBanner,re=>re.banners])
+
+  dispatch('banners',[1,2,3])
 
   const fetchPlaylist=useCallback(()=>http.get('music-api/top/playlist/highquality',{cat,limit:30}),[cat])
   const [renderPlaylist,setData,res]=fetchPlaylist()

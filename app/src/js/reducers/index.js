@@ -9,6 +9,55 @@ import React,{useReducer} from 'react'
 import * as types from './types'
 
 
+
+const observeState=(state,dispatch)=>{
+    
+    /**cases的key即为types的key，value为对应需要执行的function */ 
+    /**遍历state的所有property */
+    if(!state||typeof state!=='object') return 
+
+    Object.keys(state).forEach(key=>{
+    
+       if(key!=='_init_hooks') //剔除
+       Object.defineProperty(state,key,{
+             get(val){
+                 console.log(state)
+               if(val||(typeof val==='object'&&Object.keys(val).length))
+               return val
+               else{
+                    if(state._init_hooks&&state._init_hooks.hasOwnProperty(key)){
+                        /**
+                         * state._init_hooks[key] 可能为Array或Object 
+                         * */
+                        let func,cb
+                        if(Array.isArray(state._init_hooks[key])) [func,cb]=state._init_hooks[key]
+                        else func=state._init_hooks[key]
+
+                        // dispatch(key,[1,2,3])
+
+                        // Promise.resolve(func()).then(res=>{
+                        //     if(Array.isArray(res)&&res.length>=3){ //返回的是数组，且数据固定是第三项
+                        //         res=res[2]
+                        //         if(cb&&res) res=cb(res)
+                               
+                        //         dispatch(key,res)
+    
+                        //     }
+                        // })
+
+                    }
+                    return null
+               } //先执行请求结果
+
+           },
+       })
+    })
+ 
+
+ }
+ 
+
+
 export const reactReducer=(reducer,state)=>{
 
     /**将每个type对应的init fetch放置对应的state的某个默认有的属性下面 */
@@ -20,37 +69,34 @@ export const reactReducer=(reducer,state)=>{
 
      states._init_hooks={}
 
-     /**一般func为useCallback返回的function */
-     const initHook=(type,func)=>{
+     /**一般funcs为数组，
+      * 第一个参数一般为useCallback返回的function(fetch)，
+      * 第二个参数为callback(re) 即为处理fetch返回值（数组的第三个数据）,指定接口返回值字段与state的绑定关系
+      * 如果funcs为function，则默认state对应的某项属性，直接由接口返回的数据覆盖 
+      * */
+     const initHook=(type,funcs)=>{
+
          /**type必须为string，且隶属于types */
          if(typeof type!=='string'){
              console.error('function inithook should receive 2 paramters,type must be string')
              return 
          }
-         /**key为大写，value小写，一一对应 */
-         if(!types[type.toUpperCase()]){  //type必须在types里面有，否则无效
-             console.error('type is invalid,should in types')
-             return 
-         }
          if(states._init_hooks[type]) return  //已经存在，表示之前初始化过，不做处理
 
-         if(typeof func!=='function'){
-            console.error('it should be a function')
+         if(typeof funcs!=='function'&&!Array.isArray(funcs)){
+            console.error('it should be a function or an array')
             return 
          }
 
-         states._init_hooks[type]=func
-
-         Promise.resolve(func()).then(ress=>{
-             console.log(ress)
-             if(ress&&ress.length>=3) dispatch(type,ress[3])
-         })
-          
+         states._init_hooks[type]=funcs 
+     
      }
 
      const _dispatch=(type,data)=>{
         dispatch({type,data})
      }
+
+    //  observeState(states,_dispatch)
 
 
      return [states,_dispatch,initHook]

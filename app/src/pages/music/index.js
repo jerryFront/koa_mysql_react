@@ -17,21 +17,17 @@ const {TabPane}=Tabs
 
 const Index=(props)=>{
 
-  const {musicState,dispatch,initHook} = useContext(musicContext);
+  const {musicState,dispatch,intercept} = useContext(musicContext)
 
- 
  
   const [title,setTitle]=useState('')  //模糊搜索
 
   const [cat,setTag]=useState('')
 
-  const fetchBanner=useCallback(()=>http.get('music-api/banner',{}),[])
-  const [,,banners]=[0,0,0]
+  const fetchBanner=useCallback(()=>http.get('music-api/banner',{},intercept('banners',re=>re.banners)),[])
+  fetchBanner()
 
-  // initHook('banners',[fetchBanner,re=>re.banners])
-
-  dispatch('banners',[1,2,3])
-
+  
   const fetchPlaylist=useCallback(()=>http.get('music-api/top/playlist/highquality',{cat,limit:30}),[cat])
   const [renderPlaylist,setData,res]=fetchPlaylist()
 
@@ -115,11 +111,11 @@ const Index=(props)=>{
             
               <Row>
 
-
-              <section className={styles.swiperContainer}>
-                <DeclareRef component={Swiper} $ref={swiper1} type={0} banners={banners} tap={tapBanner}>
+              
+              {musicState.banners&&(<section className={styles.swiperContainer}>
+                <DeclareRef component={Swiper} $ref={swiper1} type={0} banners={musicState} tap={tapBanner}>
                 </DeclareRef>
-              </section>   
+              </section>)}   
 
 
                 <Col lg={24} xl={{span:18,offset:3}}>

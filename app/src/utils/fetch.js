@@ -126,7 +126,18 @@ export default class http{
        * 因为hooks只能在主function中执行，所以必须init时执行一次(实际不发起请求)
        *  */
       if(!data||!beforeHttp(url,data)) return
- 
+
+      /**如果传有第三个参数，且第三个参数为function，
+       * 则为intercept，需要先执行其function，用返回结果来判断是否需要继续请求
+       * 
+       *  */
+      let resolve=null
+      /**第一次执行完后，第三个参数本身function会变为对应的执行结果 */
+      if(args.length>=3&&(typeof args[2]==='function'||(args[2]===true))){
+        resolve=args[2]
+        if(resolve&&typeof resolve==='boolean') return  //reducer有数据则直接不请求
+      }
+      
       const userheader={token:getStorage('user_info')?getStorage('user_info').token:''}
       baseConfig.headers={...baseConfig.headers,...this.createHeader(),...userheader}
       baseConfig.url=`${rootPath}${url}`
@@ -171,10 +182,10 @@ export default class http{
           return
         }
 
-    
+
         /**如果args传递了第三个参数type，则表明需要自定义处理返回情况，此时原样返回 */
         if(res.code&&res.code!==200){
-          if(args.length<3||!args[3]){
+          if(args.length<3||!args[2]||typeof args[2]==='function'){
             message.error(res.msg,6)
             return
           }else{ //传有意义的type !!type===true
@@ -187,7 +198,11 @@ export default class http{
          * 兼容第三方的转发请求，可能没有data字段
          * 如果没有data字段则返回上一层res
          *  */
-        setRes(res.data?res.data:res)
+
+        const re=res.data?res.data:res
+        setRes(re)
+
+        if(re&&resolve&&typeof resolve==='function') resolve(re)
         
       }catch(e){
         setIsLoading(false)

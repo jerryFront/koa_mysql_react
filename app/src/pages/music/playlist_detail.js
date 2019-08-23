@@ -1,4 +1,4 @@
-import React,{useCallback,useEffect,useRef,useState,Fragment} from 'react'
+import React,{useCallback,useContext,useEffect,useRef,useState,Fragment} from 'react'
 import {Layout,Row,Col,Card} from 'antd'
 import {Link} from 'react-router-dom'
 import http from '@utils/fetch'
@@ -6,13 +6,16 @@ import Header from '@components/common/header'
 import {DeclareRef} from '@utils/ref'
 
 import styles from './index.less'
+import {musicContext} from '@pages/base/index'
 
 const {Footer,Content}=Layout
 
 const Detail= (props)=>{
 
-    console.log(props)
 
+  const {musicState,dispatch,intercept} = useContext(musicContext)
+
+  console.log(musicState)
 
   const id=props.match.params.id
   const fetchPlaylist=useCallback(()=>http.get('music-api/playlist/detail',id?{id}:null),[])

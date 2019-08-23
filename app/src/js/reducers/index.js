@@ -92,13 +92,35 @@ export const reactReducer=(reducer,state)=>{
      
      }
 
+     /**简化dispatch */
      const _dispatch=(type,data)=>{
         dispatch({type,data})
      }
 
+    /**
+     * 拦截非必要请求
+     * 接收参数和_dispatch一样
+     * 优先查询state[key]即reducer里是否有值
+     * 有则返回true(方便判断)
+     * 如没有则原样返回dispatch
+     * @params {string} type 为state的key
+     * @params {function} cb为处理fetch返回值res的层级关系，确保提交给reducer的值的层级正确性
+     * 
+     *  */
+     const intercept=(type,cb)=>{
+         if(!type||typeof type!=='string'){
+            console.error('intercept type must be string')
+            return 
+         }
+         if(!states.hasOwnProperty(type)) return
+         if(states[type]) return true
+         else return res=>_dispatch(type,cb?cb(res):res)
+     }
+
+
     //  observeState(states,_dispatch)
 
 
-     return [states,_dispatch,initHook]
+     return [states,_dispatch,intercept]
 
 } 

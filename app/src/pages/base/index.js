@@ -72,7 +72,7 @@ export function App(){
      * exact 指定确定的路由
      * v4 没有onEnter onLeave onUpdate 对应修改要到Route的生命周期对应
      */
-     const [musicState,dispatch,initHook]=reactReducer(musicReducer,{
+     const [musicState,dispatch,intercept]=reactReducer(musicReducer,{
         banners:null
       })
 
@@ -82,17 +82,17 @@ export function App(){
        <HashRouter>
           <Switch>
           
-              <musicContext.Provider value={{musicState,dispatch,initHook}}>
+              <musicContext.Provider value={{musicState,dispatch,intercept}}>
               <Route4 path="/" exact component={AsyncPage('music/index')}></Route4>
               <Route4 path="/playlist/detail/:id" component={AsyncPage('music/playlist_detail')}></Route4> 
-              </musicContext.Provider> 
+      
 
               <Route4 path="/index"  component={AsyncPage('base/primary')}></Route4>
               <Route4 path="/set" exact  onEnter={isLogin} component={AsyncPage('login/set')}></Route4>
               <Route4 path="/login"  component={AsyncPage('login/index')}></Route4>
               <Route4 path="/news" exact component={AsyncPage('news/index')}></Route4>
               <Route4 path="/news/detail/:uid" component={AsyncPage('news/detail')}></Route4>
-             
+              </musicContext.Provider> 
             
              
               <Redirect to="/" />

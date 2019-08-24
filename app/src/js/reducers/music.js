@@ -1,10 +1,7 @@
-import * as types from './types'
-
 
 const state={
     banners:null
 }
-
 
 
 const initCase=(state)=>{
@@ -38,12 +35,6 @@ export const  musicReducer=(state,action)=>{
             ...state,   
             banners:action.data
            }
-     
-       case types.UPDATE_MUSIC_BANNER:
-            return {
-                ...state,   
-                banners:action.data
-               }
        default:
            return state;   
    }

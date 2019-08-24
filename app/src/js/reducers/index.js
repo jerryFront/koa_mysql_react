@@ -6,7 +6,7 @@
  * 
  */
 import React,{useReducer} from 'react'
-import * as types from './types'
+
 
 
 
@@ -33,7 +33,6 @@ const observeState=(state,dispatch)=>{
                         if(Array.isArray(state._init_hooks[key])) [func,cb]=state._init_hooks[key]
                         else func=state._init_hooks[key]
 
-                        // dispatch(key,[1,2,3])
 
                         // Promise.resolve(func()).then(res=>{
                         //     if(Array.isArray(res)&&res.length>=3){ //返回的是数组，且数据固定是第三项
@@ -67,30 +66,30 @@ export const reactReducer=(reducer,state)=>{
 
      const [states,dispatch]=useReducer(reducer,state)
 
-     states._init_hooks={}
+    //  states._init_hooks={}
 
      /**一般funcs为数组，
       * 第一个参数一般为useCallback返回的function(fetch)，
       * 第二个参数为callback(re) 即为处理fetch返回值（数组的第三个数据）,指定接口返回值字段与state的绑定关系
       * 如果funcs为function，则默认state对应的某项属性，直接由接口返回的数据覆盖 
       * */
-     const initHook=(type,funcs)=>{
+    //  const initHook=(type,funcs)=>{
 
-         /**type必须为string，且隶属于types */
-         if(typeof type!=='string'){
-             console.error('function inithook should receive 2 paramters,type must be string')
-             return 
-         }
-         if(states._init_hooks[type]) return  //已经存在，表示之前初始化过，不做处理
+    //      /**type必须为string，且隶属于types */
+    //      if(typeof type!=='string'){
+    //          console.error('function inithook should receive 2 paramters,type must be string')
+    //          return 
+    //      }
+    //      if(states._init_hooks[type]) return  //已经存在，表示之前初始化过，不做处理
 
-         if(typeof funcs!=='function'&&!Array.isArray(funcs)){
-            console.error('it should be a function or an array')
-            return 
-         }
+    //      if(typeof funcs!=='function'&&!Array.isArray(funcs)){
+    //         console.error('it should be a function or an array')
+    //         return 
+    //      }
 
-         states._init_hooks[type]=funcs 
+    //      states._init_hooks[type]=funcs 
      
-     }
+    //  }
 
      /**简化dispatch */
      const _dispatch=(type,data)=>{
@@ -118,7 +117,7 @@ export const reactReducer=(reducer,state)=>{
      }
 
 
-    //  observeState(states,_dispatch)
+
 
 
      return [states,_dispatch,intercept]

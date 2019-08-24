@@ -24,19 +24,14 @@ const initCase=(state)=>{
 export const  musicReducer=(state,action)=>{
 
 
-   const {type}=action
+   const {type,data}=action
    
 
   
    switch(type){
        
-       case 'banners':
-           return {
-            ...state,   
-            banners:action.data
-           }
        default:
-           return state;   
+           return null;   
    }
 
 }

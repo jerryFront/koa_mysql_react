@@ -99,3 +99,8 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 1.React.Fragment包裹，类似template，不引入多余的dom层级
 2.service worker 只是一个驻留在我们的 app 内的一个  JavaScript 文件 (注意，这个文件的url 是相对于 origin， 而不是相对于引用它的那个 JS 文件)
 3.service worker工作再worker context，没有DOM的访问权限
+
+2019.8.24
+
+1.useContext如果要在页面间类似redux数据交互，则必须放在Route上面(特定页面需要使用则会重新引入对应的Context，不引用则不用通知，可以避开redux繁重弊端)
+2.reducer可以采用Pro扩充默认的和state下key一一对应的key来简化默认的reducer的初始化

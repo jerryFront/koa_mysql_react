@@ -10,6 +10,7 @@ import React,{useReducer} from 'react'
 
 
 
+
 const observeState=(state,dispatch)=>{
     
     /**cases的key即为types的key，value为对应需要执行的function */ 
@@ -56,15 +57,50 @@ const observeState=(state,dispatch)=>{
  }
  
 
+/**默认定义state下所有属性attr的case处理情况,并返回默认的reducer */ 
+const  definekeyReducer=(state)=>{
 
+    return action=>{
+        
+        const {type,data}=action
+
+        if(typeof state==='object'){
+          
+            if(state.hasOwnProperty(type)) return {...state,[type]:data}
+            else return state
+
+        }else return state
+
+    }
+
+} 
+
+/**
+ * reducer采取compose的管道形式，默认的initReducer优先匹配
+ * 而每个reducer会在useReducer之前默认创建state下面所有的属性case(前提是initReducer为匹配到action.type)
+ * 
+ */
 export const reactReducer=(reducer,state)=>{
 
     /**将每个type对应的init fetch放置对应的state的某个默认有的属性下面 */
+    
+    const keyReducer=definekeyReducer(state)
+
+    const proReducer=(state,action)=>{
+        
+        // const res=reducer(state,action)
+        // if(res)  return res
+        // //未命中，则找keyReducer
+        // return keyReducer(action)
+
+        return reducer(state,action)||keyReducer(action)
+
+    }
 
     if(!state||typeof state!=='object') return
     /**设置默认属性_init_hooks {} 其接受key:type(正常为types下面的)和value:initFunction*/
 
-     const [states,dispatch]=useReducer(reducer,state)
+     const [states,dispatch]=useReducer(proReducer,state)
 
     //  states._init_hooks={}
 

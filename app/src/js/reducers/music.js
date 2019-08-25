@@ -9,6 +9,7 @@ const state={
     tag_摇滚:null,
     tag_民谣:null,
     tag_电子:null,
+    playlist_detail:null,
 }
 
 

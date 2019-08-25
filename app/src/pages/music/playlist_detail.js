@@ -15,11 +15,9 @@ const Detail= (props)=>{
 
   const {musicState,dispatch,intercept} = useContext(musicContext)
 
-  console.log(musicState)
-
   const id=props.match.params.id
-  const fetchPlaylist=useCallback(()=>http.get('music-api/playlist/detail',id?{id}:null),[])
-  const [renderPlaylist,,res]=fetchPlaylist()
+  const fetchPlaylist=useCallback(()=>http.get('music-api/playlist/detail',id?{id}:null,intercept('playlist_detail')),[])
+  const [,,res]=fetchPlaylist()
 
   const renderDetailDescription=res=>{
       if(!res||!res.description) return null

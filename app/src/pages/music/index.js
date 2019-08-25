@@ -132,7 +132,7 @@ const Index=(props)=>{
                         {cat=='摇滚'&&renderTabPane()} 
                       </TabPane> 
                       <TabPane tab="民谣" key="民谣">
-                        {cat=='华语民谣'&&renderTabPane()} 
+                        {cat=='民谣'&&renderTabPane()} 
                       </TabPane> 
                       <TabPane tab="电子" key="电子">
                         {cat=='电子'&&renderTabPane()} 

@@ -108,7 +108,7 @@ export default class http{
 
 
     //需要监听data变化的时候，必须设置其为hook相关
-    const [data,setData1]=useState(args[1])
+    const [data,setData]=useState(args[1])
 
     const currentData=useRef()
 
@@ -117,13 +117,16 @@ export default class http{
     const [res,setRes]=useState(null)
     const [error,setError]=useState(null)
 
-    const resolve=useRef(args[2])
+    const resolve=useRef(typeof args[2]==='function'?args[2](data):null)
 
-    /**设置对应的setData钩子，如果手动触发setData表明要强制更新，此时需要重置resolve */
-    const setData=data=>{
-      resolve.current=args[2]
-      setData1(data)
-    }
+    /**
+     * 设置对应的setData钩子，如果手动触发setData表明要强制更新，此时需要重置resolve
+     * 已经做了redux脏数据的检测处理,则没必要特殊处理了
+     *  */
+    // const setData=data=>{
+    //   resolve.current=typeof args[2]==='function'?args[2](data):null
+    //   setData1(data)
+    // }
 
     const isPost=baseConfig.method==='post'?true:false
 

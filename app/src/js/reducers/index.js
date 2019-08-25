@@ -105,7 +105,7 @@ export const reactReducer=(args)=>{
 
      const [states,dispatch]=useReducer(reducer,state)
 
-    //  states._init_hooks={}
+     states._init_hooks={}
 
      /**一般funcs为数组，
       * 第一个参数一般为useCallback返回的function(fetch)，
@@ -144,15 +144,50 @@ export const reactReducer=(args)=>{
      * @params {string} type 为state的key
      * @params {function} cb为处理fetch返回值res的层级关系，确保提交给reducer的值的层级正确性
      * 
-     *  */
+     * 
+     *  实际场景还会遇到与redux一样的脏数据问题，因为是优先缓存策略，可这时候如果数据要求有更新
+     * (一般为params变化)，则还会默认拿state的脏(旧)数据，而数据得不到更新
+     * 为解决这个问题，则需要存储一个和state的attr对应的数据结构，专门存储对应的params
+     * 当下次判断params有更新，则表示数据要求被更新，则走fetch
+     * 
+     * 扩展功能，则必须引入第三个参数data即params，用来存储或判断 
+     * */
      const intercept=(type,cb)=>{
-         if(!type||typeof type!=='string'){
-            console.error('intercept type must be string')
-            return 
+
+         return params=>{  //params即为fetch的参数
+             
+            let param=null
+            try{
+              param=typeof params==='object'?JSON.stringify(params):''
+            }catch(e){
+                console.error(e.toString())
+            }
+
+            if(!type||typeof type!=='string'){
+                console.error('intercept type must be string')
+                return 
+             }
+             if(!states.hasOwnProperty(type)){
+                states._init_hooks[type]=param 
+                return
+             } 
+             if(states[type]){
+                /**如果有值但参数有变化，则不应该返回脏数据 */ 
+                if(states._init_hooks[type]&&states._init_hooks[type]!==param){
+                    states._init_hooks[type]=param 
+                    return 
+                }
+                states._init_hooks[type]=param 
+                return states[type]
+             } 
+             else {
+                states._init_hooks[type]=param 
+                return res=>{_dispatch(type,cb?cb(res):res);return res}
+             }    
+         
          }
-         if(!states.hasOwnProperty(type)) return
-         if(states[type]) return states[type]
-         else return res=>{_dispatch(type,cb?cb(res):res);return res}
+
+      
      }
 
 

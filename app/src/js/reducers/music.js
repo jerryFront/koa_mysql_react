@@ -2,6 +2,7 @@
 const state={
     banners:null,
     newest:null,
+    cat:'',
     tag_:null,
     tag_华语:null,
     tag_流行:null,

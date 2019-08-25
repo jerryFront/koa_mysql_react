@@ -22,7 +22,7 @@ const Index=(props)=>{
 
   const [title,setTitle]=useState('')  //模糊搜索
 
-  const [cat,setTag]=useState('')
+  const [cat,setTag]=useState(musicState.cat)
 
   const fetchBanner=useCallback(()=>http.get('music-api/banner',{},intercept('banners',re=>re.banners)),[])
   fetchBanner()
@@ -33,12 +33,15 @@ const Index=(props)=>{
   const fetchNewest=useCallback(()=>http.get('music-api/album/newest',{},intercept('newest')),[])
   const [renderNewest,]=fetchNewest()
 
-  useEffect(()=>{
-   if(cat) setData({
-      cat,
-      limit:30,
-    })
-  },[cat])
+    
+  // useEffect(()=>{ //dispatch之后则不需要监听了，默认会触发
+  //  console.log(cat) 
+  //  if(cat)
+  //   setData({
+  //     cat,
+  //     limit:30,
+  //   })
+  // },[cat])
 
 
 
@@ -63,13 +66,12 @@ const Index=(props)=>{
 
   /**tab切换 */
   const switchTab=name=>{
-     setTag(name)
+     dispatch('cat',name)
   }
 
 
   /**渲染tabPane */
   const renderTabPane=()=>{
-    
     return (
       <Card bordered={false}> 
       <section className={`flex ${styles.personalizeContainer}`} >
@@ -81,7 +83,6 @@ const Index=(props)=>{
       </section>
       </Card> 
     )
-
   }
   
 
@@ -117,7 +118,7 @@ const Index=(props)=>{
 
                 <Col lg={24} xl={{span:18,offset:3}}>
 
-                  <Tabs defaultActiveKey="" onChange={switchTab}>
+                  <Tabs defaultActiveKey={cat} onChange={switchTab}>
                       <TabPane tab="全部" key="">
                         {cat==''&&renderTabPane()} 
                       </TabPane> 

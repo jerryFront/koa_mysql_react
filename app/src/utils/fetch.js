@@ -108,7 +108,7 @@ export default class http{
 
 
     //需要监听data变化的时候，必须设置其为hook相关
-    const [data,setData]=useState(args[1])
+    const [data,setData1]=useState(args[1])
 
     const currentData=useRef()
 
@@ -117,9 +117,16 @@ export default class http{
     const [res,setRes]=useState(null)
     const [error,setError]=useState(null)
 
+    const resolve=useRef(args[2])
+
+    /**设置对应的setData钩子，如果手动触发setData表明要强制更新，此时需要重置resolve */
+    const setData=data=>{
+      resolve.current=args[2]
+      setData1(data)
+    }
+
     const isPost=baseConfig.method==='post'?true:false
 
-    let resolve=null
 
     const fetch=useCallback(async ()=>{
 
@@ -135,14 +142,17 @@ export default class http{
        *  */
 
       /**第一次执行完后，第三个参数本身function会变为对应的执行结果 */
-      if(args.length>=3&&(typeof args[2]==='function'||typeof args[2]==='object'||(args[2]===true))){
-        resolve=args[2]
-  
-        if(resolve&&typeof resolve!=='function'){ //reducer有数据则直接不请求，此时resolve即为返回的数据
-          // setRes(resolve) 会造成循环rerender
-          return
-        }  
-      }
+      // if(args.length>=3&&(typeof args[2]==='function'||typeof args[2]==='object'||(args[2]===true))){
+      //   resolve=args[2]
+      //   console.log(resolve) 
+      //   if(resolve&&typeof resolve!=='function'){ //reducer有数据则直接不请求，此时resolve即为返回的数据
+      //     // setRes(resolve) 会造成循环rerender
+      //     return
+      //   }  
+      // }
+
+
+      if(resolve.current&&typeof resolve.current!=='function') return
       
       const userheader={token:getStorage('user_info')?getStorage('user_info').token:''}
       baseConfig.headers={...baseConfig.headers,...this.createHeader(),...userheader}
@@ -206,7 +216,7 @@ export default class http{
  
         const re=res.data?res.data:res
         setRes(re) 
-        // if(re&&resolve&&typeof resolve==='function') resolve(re)
+
         
       }catch(e){
         console.error(e.toString())
@@ -218,6 +228,10 @@ export default class http{
     },[data])
 
     /**useCallback的监听必须是hooks相关变量，才能捕捉到变化，普通变量监听不到 */
+
+    useEffect(()=>{
+      if(res&&resolve.current&&typeof resolve.current==='function') resolve.current(res)
+    },[res])
 
 
     useEffect(()=>{
@@ -241,7 +255,7 @@ export default class http{
           if(error) return <div>error</div>
           else if(isLoading) return<div className="flex-center inline-loading"><Spin   tip="Loading..."  size="large" /></div> 
           else if(res) return renderChildren({res,error}) //返回结果和error(可能需要单独处理error的场景)
-          else if(resolve&&typeof resolve!=='function') return renderChildren({res:resolve}) //如果reducer有缓存，则返回缓存数据
+          else if(resolve.current&&typeof resolve.current!=='function') return renderChildren({res:resolve.current}) //如果reducer有缓存，则返回缓存数据
           else return null
     
         },[isLoading,res,error])

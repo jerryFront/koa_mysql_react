@@ -119,6 +119,8 @@ export default class http{
 
     const isPost=baseConfig.method==='post'?true:false
 
+    let resolve=null
+
     const fetch=useCallback(async ()=>{
 
       /**
@@ -131,11 +133,15 @@ export default class http{
        * 则为intercept，需要先执行其function，用返回结果来判断是否需要继续请求
        * 
        *  */
-      let resolve=null
+
       /**第一次执行完后，第三个参数本身function会变为对应的执行结果 */
-      if(args.length>=3&&(typeof args[2]==='function'||(args[2]===true))){
+      if(args.length>=3&&(typeof args[2]==='function'||typeof args[2]==='object'||(args[2]===true))){
         resolve=args[2]
-        if(resolve&&typeof resolve==='boolean') return  //reducer有数据则直接不请求
+  
+        if(resolve&&typeof resolve!=='function'){ //reducer有数据则直接不请求，此时resolve即为返回的数据
+          // setRes(resolve) 会造成循环rerender
+          return
+        }  
       }
       
       const userheader={token:getStorage('user_info')?getStorage('user_info').token:''}
@@ -149,7 +155,6 @@ export default class http{
         baseConfig.params=data
         baseConfig.data=null
       }
-
 
       if(isLoading) return
       setIsLoading(true)
@@ -198,13 +203,13 @@ export default class http{
          * 兼容第三方的转发请求，可能没有data字段
          * 如果没有data字段则返回上一层res
          *  */
-
+ 
         const re=res.data?res.data:res
-        setRes(re)
-
-        if(re&&resolve&&typeof resolve==='function') resolve(re)
+        setRes(re) 
+        // if(re&&resolve&&typeof resolve==='function') resolve(re)
         
       }catch(e){
+        console.error(e.toString())
         setIsLoading(false)
         setError(e)   
       }
@@ -236,6 +241,7 @@ export default class http{
           if(error) return <div>error</div>
           else if(isLoading) return<div className="flex-center inline-loading"><Spin   tip="Loading..."  size="large" /></div> 
           else if(res) return renderChildren({res,error}) //返回结果和error(可能需要单独处理error的场景)
+          else if(resolve&&typeof resolve!=='function') return renderChildren({res:resolve}) //如果reducer有缓存，则返回缓存数据
           else return null
     
         },[isLoading,res,error])

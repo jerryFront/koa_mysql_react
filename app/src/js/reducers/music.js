@@ -1,19 +1,14 @@
 
 const state={
-    banners:null
+    banners:null,
+    newest:null,
+    tag_:null,
+    tag_华语:null,
+    tag_流行:null,
+    tag_摇滚:null,
+    tag_民谣:null,
+    tag_电子:null,
 }
-
-
-const initCase=(state)=>{
-    
-    const cases={}
-
-    Object.keys(state).forEach(it=>{
-        cases[it]
-    })
-
-}
-
 
 
 /**
@@ -26,15 +21,24 @@ export const  musicReducer=(state,action)=>{
 
    const {type,data}=action
    
+   if(state.hasOwnProperty(type)) return {...state,[type]:data}
+   else return state
 
   
-   switch(type){
-       
-       default:
-           return null;   
-   }
+//    switch(type){
+//        case 'tag_':
+//             return {...state,[type]:data}
+//        case 'banners':
+//            return {...state,[type]:data}
+//        case 'newest':
+//            return {...state,[type]:data}    
+//        default:
+//            return state;   
+//    }
 
 }
+
+export default [state,musicReducer]
 
 
 

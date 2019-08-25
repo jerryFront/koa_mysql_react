@@ -13,9 +13,8 @@ import styles from './index.less'
 import {Spin} from 'antd'
 import {isLogin} from './common'
 
-import {musicReducer} from '@reducers/music'
+import musicReducer from '@reducers/music'
 import {reactReducer} from '@reducers/index'
-
 
 
 export const musicContext=React.createContext(null)
@@ -72,9 +71,7 @@ export function App(){
      * exact 指定确定的路由
      * v4 没有onEnter onLeave onUpdate 对应修改要到Route的生命周期对应
      */
-     const [musicState,dispatch,intercept]=reactReducer(musicReducer,{
-        banners:null
-      })
+     const [musicState,dispatch,intercept]=reactReducer(musicReducer)
 
 
     return (

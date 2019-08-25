@@ -10,6 +10,7 @@ import {DeclareRef} from '@utils/ref'
 import {musicContext} from '@pages/base/index'
 
 import styles from './index.less'
+import music from '../../js/reducers/music';
 
 
 const {Footer,Content}=Layout
@@ -19,25 +20,21 @@ const Index=(props)=>{
 
   const {musicState,dispatch,intercept} = useContext(musicContext)
 
- 
   const [title,setTitle]=useState('')  //模糊搜索
 
   const [cat,setTag]=useState('')
 
   const fetchBanner=useCallback(()=>http.get('music-api/banner',{},intercept('banners',re=>re.banners)),[])
   fetchBanner()
-
   
-  const fetchPlaylist=useCallback(()=>http.get('music-api/top/playlist/highquality',{cat,limit:30}),[cat])
-  const [renderPlaylist,setData,res]=fetchPlaylist()
-
-  const fetchNewest=useCallback(()=>http.get('music-api/album/newest',{}),[])
-  const [renderNewest,,newRes]=fetchNewest()
-
-
+  const fetchPlaylist=useCallback(()=>http.get('music-api/top/playlist/highquality',{cat,limit:30},intercept(`tag_${cat}`)),[cat])
+  const [renderPlaylist,setData]=fetchPlaylist()
+  
+  const fetchNewest=useCallback(()=>http.get('music-api/album/newest',{},intercept('newest')),[])
+  const [renderNewest,]=fetchNewest()
 
   useEffect(()=>{
-    setData({
+   if(cat) setData({
       cat,
       limit:30,
     })
@@ -71,7 +68,7 @@ const Index=(props)=>{
 
 
   /**渲染tabPane */
-  const renderTabPane=(name,res)=>{
+  const renderTabPane=()=>{
     
     return (
       <Card bordered={false}> 
@@ -122,22 +119,22 @@ const Index=(props)=>{
 
                   <Tabs defaultActiveKey="" onChange={switchTab}>
                       <TabPane tab="全部" key="">
-                        {renderTabPane('',res)} 
+                        {cat==''&&renderTabPane()} 
                       </TabPane> 
                       <TabPane tab="华语" key="华语">
-                        {renderTabPane('',res)} 
+                        {cat=='华语'&&renderTabPane()} 
                       </TabPane> 
                       <TabPane tab="流行" key="流行">
-                        {renderTabPane('',res)} 
+                        {cat=='流行'&&renderTabPane()} 
                       </TabPane> 
                       <TabPane tab="摇滚" key="摇滚">
-                        {renderTabPane('',res)} 
+                        {cat=='摇滚'&&renderTabPane()} 
                       </TabPane> 
                       <TabPane tab="民谣" key="民谣">
-                        {renderTabPane('',res)} 
+                        {cat=='华语民谣'&&renderTabPane()} 
                       </TabPane> 
                       <TabPane tab="电子" key="电子">
-                        {renderTabPane('',res)} 
+                        {cat=='电子'&&renderTabPane()} 
                       </TabPane> 
                   </Tabs>
 

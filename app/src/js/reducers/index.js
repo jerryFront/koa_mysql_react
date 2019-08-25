@@ -80,27 +80,30 @@ const  definekeyReducer=(state)=>{
  * 而每个reducer会在useReducer之前默认创建state下面所有的属性case(前提是initReducer为匹配到action.type)
  * 
  */
-export const reactReducer=(reducer,state)=>{
+export const reactReducer=(args)=>{
+
+    const [state,reducer]=args
 
     /**将每个type对应的init fetch放置对应的state的某个默认有的属性下面 */
     
-    const keyReducer=definekeyReducer(state)
+    // const keyReducer=definekeyReducer(state)
 
-    const proReducer=(state,action)=>{
+    // const proReducer=(state,action)=>{
         
-        // const res=reducer(state,action)
-        // if(res)  return res
-        // //未命中，则找keyReducer
-        // return keyReducer(action)
+    //     const res=reducer(state,action)
+    //     if(res&&res[action.type])  return res
+    //     //未命中，则找keyReducer
+    //     return keyReducer(action)
 
-        return reducer(state,action)||keyReducer(action)
 
-    }
+    //     // return reducer(state,action)||keyReducer(action)
+
+    // }
 
     if(!state||typeof state!=='object') return
     /**设置默认属性_init_hooks {} 其接受key:type(正常为types下面的)和value:initFunction*/
 
-     const [states,dispatch]=useReducer(proReducer,state)
+     const [states,dispatch]=useReducer(reducer,state)
 
     //  states._init_hooks={}
 
@@ -148,8 +151,8 @@ export const reactReducer=(reducer,state)=>{
             return 
          }
          if(!states.hasOwnProperty(type)) return
-         if(states[type]) return true
-         else return res=>_dispatch(type,cb?cb(res):res)
+         if(states[type]) return states[type]
+         else return res=>{_dispatch(type,cb?cb(res):res);return res}
      }
 
 

@@ -48,7 +48,6 @@
         font-size:13px;
         line-height:20px;
         color:@text2;
-
     }
  }
 
@@ -75,6 +74,11 @@
         margin-top:5px;
       }
 
+      label{
+        cursor:pointer;
+        color:@text2;
+      }
+
       nav{
           margin:5px 0;
           label{
@@ -92,6 +96,14 @@
         font-size:13px;
         color:@text3;
         line-height:22px;
+        max-height:330px;
+        overflow-y:hidden;
+        word-wrap:break-word;
+        word-break: break-word;
+        &.unfold{
+            max-height:inherit;
+            overflow-y:auto;
+        }
       }
 
     }
@@ -103,4 +115,47 @@
     font-size:14px;
     color:@text3;
     margin-left:5px;
+}
+
+.songList{
+    border:1px @border1 solid;
+    li{
+        line-height:40px;
+        display:flex;
+        p{
+          text-indent:6px;
+          font-size:13px;
+          overflow:hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap; 
+        }
+        p:nth-child(1){
+            flex:1;
+        }
+        p:nth-child(2){
+            flex:3;
+        }
+        p:nth-child(3){
+            flex:1;
+        }
+        p:nth-child(4){
+            flex:2;
+        }
+        p:nth-child(5){
+            flex:3;
+            border-right:0;
+        }
+    }
+    li:nth-child(2n){
+        background:@border1;
+    } 
+    li:nth-child(2n+1){
+       background:@bgColor1;
+    } 
+    .header{
+        p{
+            border-right:1px @border1 solid;
+        }
+    }
+    
 }

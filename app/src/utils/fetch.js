@@ -154,7 +154,7 @@ export default class http{
       //   }  
       // }
 
-
+      console.log(url,new Date().getTime(),resolve.current)
       if(resolve.current&&typeof resolve.current!=='function') return
       
       const userheader={token:getStorage('user_info')?getStorage('user_info').token:''}
@@ -233,7 +233,9 @@ export default class http{
     /**useCallback的监听必须是hooks相关变量，才能捕捉到变化，普通变量监听不到 */
 
     useEffect(()=>{
-      if(res&&resolve.current&&typeof resolve.current==='function') resolve.current(res)
+      if(res&&resolve.current&&typeof resolve.current==='function'){
+        resolve.current=resolve.current(res)
+      } 
     },[res])
 
 
@@ -264,7 +266,7 @@ export default class http{
         },[isLoading,res,error])
     
          /**同时返回renderProps的模板处理函数 以及动态setData函数(很多场景需要动态改变触发，比如翻页搜索等) 和 获取的res结果(可能出现不render只单纯获取数据的场景) */
-         return [DataBoundary,setData,res,isLoading]  
+         return [DataBoundary,setData,res||resolve.current,isLoading]  
 
   }
 

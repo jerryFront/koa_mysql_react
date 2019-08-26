@@ -173,12 +173,15 @@ export const reactReducer=(args)=>{
              } 
              if(states[type]){
                 /**如果有值但参数有变化，则不应该返回脏数据 */ 
-                if(states._init_hooks[type]&&states._init_hooks[type]!==param){
+                if(!states._init_hooks[type]||states._init_hooks[type]!==param){
                     states._init_hooks[type]=param 
                     return 
+                }else{
+                    states._init_hooks[type]=param 
+                    return states[type]
                 }
-                states._init_hooks[type]=param 
-                return states[type]
+                
+
              } 
              else {
                 states._init_hooks[type]=param 

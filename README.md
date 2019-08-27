@@ -104,3 +104,7 @@ https://www.cnblogs.com/cangqinglang/p/10266952.html
 
 1.useContext如果要在页面间类似redux数据交互，则必须放在Route上面(特定页面需要使用则会重新引入对应的Context，不引用则不用通知，可以避开redux繁重弊端)
 2.reducer可以采用Pro扩充默认的和state下key一一对应的key来简化默认的reducer的初始化
+
+2019.8.27
+
+1.fetch中的统一dispatch会存在，多个fetch异步进行，先dispatch先rerender，而导致后续的fetch无法dispatch，处理方式暂时为dispatch多重收集，延时处理(防抖动)然后统一提交reducer来做到模拟同步渲染

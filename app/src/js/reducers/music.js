@@ -18,27 +18,30 @@ const state={
  * 在reducer里默认创建state下所有propertyName的处理情况
  * 
  *  */
+
+
+ 
 export const  musicReducer=(state,action)=>{
 
+   /**action的结构为{type:data},可能存在多个type */
+//    const {type,data}=action
 
-   const {type,data}=action
+//    const keys=typeof action==='object'?Object.keys(action):[]
+//    let initState=state
    
-   if(state.hasOwnProperty(type)) return {...state,[type]:data}
-   else return state
-
-  
-//    switch(type){
-//        case 'tag_':
-//             return {...state,[type]:data}
-//        case 'banners':
-//            return {...state,[type]:data}
-//        case 'newest':
-//            return {...state,[type]:data}    
-//        default:
-//            return state;   
+//    if(keys.length){
+//        keys.forEach(type=>{
+//         if(state.hasOwnProperty(type)) initState={...state,[type]:action[type]}
+//        })
 //    }
+//    return initState
+
+
+  return Object.keys(action).length?{...state,...action}:state
 
 }
+
+
 
 export default [state,musicReducer]
 

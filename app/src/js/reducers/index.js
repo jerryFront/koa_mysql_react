@@ -100,39 +100,27 @@ export const reactReducer=(args)=>{
 
     // }
 
+
     if(!state||typeof state!=='object') return
     /**设置默认属性_init_hooks {} 其接受key:type(正常为types下面的)和value:initFunction*/
 
      const [states,dispatch]=useReducer(reducer,state)
 
-     states._init_hooks={}
+     states._init_hooks=states._init_hooks||{}
 
-     /**一般funcs为数组，
-      * 第一个参数一般为useCallback返回的function(fetch)，
-      * 第二个参数为callback(re) 即为处理fetch返回值（数组的第三个数据）,指定接口返回值字段与state的绑定关系
-      * 如果funcs为function，则默认state对应的某项属性，直接由接口返回的数据覆盖 
-      * */
-    //  const initHook=(type,funcs)=>{
+ 
+     const types={}
+     let timer=null
 
-    //      /**type必须为string，且隶属于types */
-    //      if(typeof type!=='string'){
-    //          console.error('function inithook should receive 2 paramters,type must be string')
-    //          return 
-    //      }
-    //      if(states._init_hooks[type]) return  //已经存在，表示之前初始化过，不做处理
-
-    //      if(typeof funcs!=='function'&&!Array.isArray(funcs)){
-    //         console.error('it should be a function or an array')
-    //         return 
-    //      }
-
-    //      states._init_hooks[type]=funcs 
-     
-    //  }
-
-     /**简化dispatch */
+     /**
+      * 简化dispatch
+      * 因为多个fetch异步请求会分别触发dispatch，导致第一个dispatch而rerender后，之后的fetch无法dispatch到state
+      *  */
      const _dispatch=(type,data)=>{
-        dispatch({type,data})
+         types[type]=data
+
+         clearTimeout(timer)
+         timer=setTimeout(()=>dispatch(types),600)
      }
 
     /**
@@ -168,23 +156,21 @@ export const reactReducer=(args)=>{
                 return 
              }
              if(!states.hasOwnProperty(type)){
-                states._init_hooks[type]=param 
                 return
              } 
              if(states[type]){
                 /**如果有值但参数有变化，则不应该返回脏数据 */ 
-                if(!states._init_hooks[type]||states._init_hooks[type]!==param){
-                    states._init_hooks[type]=param 
+                if(!state._init_hooks[type]||state._init_hooks[type]!==param){
+                    state._init_hooks[type]=param
+                    states[type]=null 
                     return 
                 }else{
-                    states._init_hooks[type]=param 
+                    state._init_hooks[type]=param 
                     return states[type]
                 }
                 
-
-             } 
-             else {
-                states._init_hooks[type]=param 
+             } else {
+                state._init_hooks[type]=param 
                 return res=>{_dispatch(type,cb?cb(res):res);return res}
              }    
          
@@ -200,3 +186,14 @@ export const reactReducer=(args)=>{
      return [states,_dispatch,intercept]
 
 } 
+
+
+/**
+ * 输出统一的比较简便的reducer
+ * action为变动，格式为{type1:data1,type2:data2}
+ */
+export const generateReducer=(state,action)=>{
+ 
+    return (typeof action==='object'&&Object.keys(action).length)?{...state,...action}:state
+
+}

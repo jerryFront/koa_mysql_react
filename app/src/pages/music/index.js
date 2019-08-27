@@ -34,17 +34,6 @@ const Index=(props)=>{
   const [renderNewest,]=fetchNewest()
 
     
-  // useEffect(()=>{ //dispatch之后则不需要监听了，默认会触发
-  //  console.log(cat) 
-  //  if(cat)
-  //   setData({
-  //     cat,
-  //     limit:30,
-  //   })
-  // },[cat])
-
-
-
   let searchRef1={},swiper1={}  //用于ref
 
 

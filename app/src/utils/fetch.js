@@ -1,8 +1,8 @@
 import axios from 'axios'
 import React,{useState,useEffect,useCallback,useRef} from 'react'
 import {message,Spin} from 'antd'
-import {timeout,rootPath} from '@configs/const'
-import {getStorage,removeStorage} from '@utils/storage'
+import {timeout,rootPath,storage_prefix,env} from '@configs/const'
+import {getStorage,removeStorage,setStorage} from '@utils/storage'
 
 
 
@@ -12,8 +12,8 @@ const qs=require('qs')
 
 
 
-
-const blackList=[
+/**白名单，不检验重复提交 */
+const whiteList=[
 
  
 ]
@@ -25,15 +25,33 @@ const blackList=[
  然后2秒后删除该缓存
 */
 const beforeRequest=(list,url,data)=>{
-    
+   
+   const checkRepeat=obj=>{
+     if(obj){ //如果含有该缓存，则判断时间戳
+       const now=new Date().getTime()
+       if(obj.time)
+       if(Math.abs(obj.time-now)<1000){
+         if(obj.data&&toString.call(data)==='[object Object]'&&toString.call(obj.data)==='[object Object]'){
+           return JSON.stringify(obj.data)==JSON.stringify(data)
+         }else return obj.data==data
+       }else return false
+     }else return true
+   }
+
     return (url,data)=>{
-        
-        return true
+        if(url&&list.indexOf(url)>0) return true 
+        let obj=null,key=`request_${storage_prefix}_${env}_${url}`
+        if(getStorage(key)) obj=getStorage(key)
+        const result=checkRepeat(obj)
+        /**重新更新缓存时间和内容,并设置定时器清除 */
+        setStorage(key)({data,time:new Date().getTime()})
+        setTimeout(()=>removeStorage(key),2000)
+        return result
 
     }
 }
 
-const beforeHttp=beforeRequest(blackList)
+const beforeHttp=beforeRequest(whiteList)
 
 
 const baseConfig={
@@ -50,6 +68,12 @@ const baseConfig={
     validateStatus(status){
       return status>=200 && status<300
     }
+}
+
+const recordRef=(obj)=>{
+  const ref=useRef(obj)
+  return ref
+
 }
 
 
@@ -111,13 +135,16 @@ export default class http{
     const [data,setData]=useState(args[1])
 
     const currentData=useRef()
+    
 
 
     const [isLoading,setIsLoading]=useState(false)
     const [res,setRes]=useState(null)
     const [error,setError]=useState(null)
 
-    const resolve=useRef(typeof args[2]==='function'?args[2](data):null)
+    /**分别存储dispatch和res */
+    const resolve=recordRef(typeof args[2]==='function'?args[2](data):null)
+
 
     /**
      * 设置对应的setData钩子，如果手动触发setData表明要强制更新，此时需要重置resolve
@@ -132,6 +159,7 @@ export default class http{
 
 
     const fetch=useCallback(async ()=>{
+
 
       /**
        * 如果没有带任何参数即undefined时候，不请求数据
@@ -154,9 +182,11 @@ export default class http{
       //   }  
       // }
 
-      console.log(url,new Date().getTime(),resolve.current)
-      if(resolve.current&&typeof resolve.current!=='function') return
-      
+      if(resolve.current&&typeof resolve.current!=='function'){
+        return
+      }
+    
+
       const userheader={token:getStorage('user_info')?getStorage('user_info').token:''}
       baseConfig.headers={...baseConfig.headers,...this.createHeader(),...userheader}
       baseConfig.url=`${rootPath}${url}`
@@ -256,13 +286,11 @@ export default class http{
         /**利用renderProps来返回通用化的Component children 卡槽式 */
 
         const DataBoundary=useCallback(renderChildren=>{
-
           if(error) return <div>error</div>
           else if(isLoading) return<div className="flex-center inline-loading"><Spin   tip="Loading..."  size="large" /></div> 
           else if(res) return renderChildren({res,error}) //返回结果和error(可能需要单独处理error的场景)
-          else if(resolve.current&&typeof resolve.current!=='function') return renderChildren({res:resolve.current}) //如果reducer有缓存，则返回缓存数据
+          else if(resolve.current) return renderChildren({res:resolve.current}) //如果reducer有缓存，则返回缓存数据
           else return null
-    
         },[isLoading,res,error])
     
          /**同时返回renderProps的模板处理函数 以及动态setData函数(很多场景需要动态改变触发，比如翻页搜索等) 和 获取的res结果(可能出现不render只单纯获取数据的场景) */
